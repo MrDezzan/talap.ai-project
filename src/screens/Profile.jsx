@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useMobile } from '../hooks/useMobile';
 import Icon from '../components/Icon';
 import TopBar from '../components/TopBar';
 import Card from '../components/Card';
@@ -17,6 +18,7 @@ const C = {
 export default function Profile() {
   const { user, updateUser, logout } = useAuth();
   const { lang, setLang, t } = useLanguage();
+  const isMobile = useMobile();
   const [formData, setFormData] = useState({
     name: user?.name || '',
     grade: user?.grade || '',
@@ -48,7 +50,7 @@ export default function Profile() {
     <div style={{ flex: 1, overflow: 'auto', background: C.mist, display: 'flex', flexDirection: 'column' }}>
       <TopBar title={t('settings_title')} />
 
-      <div style={{ padding: 32, maxWidth: 800 }}>
+      <div style={{ padding: isMobile ? 16 : 32, maxWidth: 800, boxSizing: 'border-box' }}>
         <div style={{ display: 'flex', gap: 32 }}>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 24 }}>
             <Card>
@@ -60,7 +62,7 @@ export default function Profile() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
                 {[
                   { label: t('settings_name'), key: 'name' },
                   { label: t('settings_grade'), key: 'grade' },

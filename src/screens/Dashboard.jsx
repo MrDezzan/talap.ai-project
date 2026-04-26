@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useMobile } from '../hooks/useMobile';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -29,6 +30,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { t, lang } = useLanguage();
   const [showNotifications, setShowNotifications] = useState(false);
+  const isMobile = useMobile();
 
   const firstName = user?.name?.split(' ')[0] || 'Студент';
 
@@ -60,7 +62,7 @@ export default function Dashboard() {
       ];
 
   const topGrant = aiProfile?.grants?.[0];
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+
 
   return (
     <div style={{ flex: 1, overflow: 'auto', background: C.mist, display: 'flex', flexDirection: 'column' }}>

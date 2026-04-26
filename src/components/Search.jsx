@@ -70,7 +70,8 @@ export default function Search({ placeholder: propsPlaceholder, value: propsValu
     <div style={{ position: 'relative' }}>
       <div
         style={{
-          width: 360,
+          width: '100%',
+          maxWidth: 360,
           padding: '0 14px',
           background: '#F5F7FB',
           borderRadius: 8,

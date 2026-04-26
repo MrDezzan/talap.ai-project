@@ -5,10 +5,12 @@ import Button from './Button';
 import logomark from '../assets/logomark.svg';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useMobile } from '../hooks/useMobile';
 
 export default function Sidebar() {
   const { user } = useAuth();
   const { lang, setLang, t } = useLanguage();
+  const isMobile = useMobile();
   
   const navItems = [
     { to: '/dashboard',   label: t('nav_home'),          icon: 'home' },
@@ -18,8 +20,6 @@ export default function Sidebar() {
     { to: '/portfolio',   label: t('nav_portfolio'),     icon: 'trophy' },
     { to: '/chat',        label: t('nav_chat'),          icon: 'sparkles' },
   ];
-
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
 
   if (isMobile) {
     return (
@@ -131,7 +131,6 @@ export default function Sidebar() {
           </button>
         ))}
       </div>
-
 
       <Link to="/settings" style={{ padding: '12px 16px', borderTop: '1px solid #E4E8F1', display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
         <Avatar name={user?.name || 'U'} size={32} />

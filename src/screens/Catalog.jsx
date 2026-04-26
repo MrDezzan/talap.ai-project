@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useMobile } from '../hooks/useMobile';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../components/Icon';
 import TopBar from '../components/TopBar';
@@ -87,6 +88,7 @@ function ProfessionModal({ profession, onClose, onAskAI, t }) {
 export default function Catalog() {
   const navigate = useNavigate();
   const { t, lang } = useLanguage();
+  const isMobile = useMobile();
   const [professions, setProfessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('all');
@@ -136,7 +138,7 @@ export default function Catalog() {
         }
       />
 
-      <div style={{ padding: 32 }}>
+      <div style={{ padding: isMobile ? 16 : 32 }}>
         <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
           {CATEGORIES.map(cat => (
             <Chip
@@ -151,7 +153,7 @@ export default function Catalog() {
           <Chip dot tone="ai" onClick={() => navigate('/chat')}>{t('cat_ai_sort')}</Chip>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))', gap: isMobile ? 12 : 16 }}>
           {filtered.map((p, i) => (
             <Card key={i} onClick={() => setSelectedProfession(p)} style={{ position: 'relative', cursor: 'pointer' }}>
               <div style={{

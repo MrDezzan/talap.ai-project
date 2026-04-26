@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useMobile } from '../hooks/useMobile';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../components/Icon';
 import TopBar from '../components/TopBar';
@@ -19,12 +20,13 @@ export default function Roadmap() {
   const { aiProfile } = useAuth();
   const { t, lang } = useLanguage();
   const steps = aiProfile?.roadmap || [];
+  const isMobile = useMobile();
 
   return (
     <div style={{ flex: 1, overflow: 'auto', background: C.mist, display: 'flex', flexDirection: 'column' }}>
       <TopBar title={t('nav_roadmap')} />
 
-      <div style={{ padding: 40, maxWidth: 800, margin: '0 auto', width: '100%' }}>
+      <div style={{ padding: isMobile ? '16px' : '40px', maxWidth: 800, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
         {steps.length > 0 ? (
           <>
             <div style={{ marginBottom: 40 }}>

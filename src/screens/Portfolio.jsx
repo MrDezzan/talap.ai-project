@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useMobile } from '../hooks/useMobile';
 import Icon from '../components/Icon';
 import TopBar from '../components/TopBar';
 import Card from '../components/Card';
@@ -203,6 +204,7 @@ function AchievementModal({ onClose, onSave, onDelete, initialData }) {
 export default function Portfolio() {
   const { user, analyzeProfile } = useAuth();
   const { t } = useLanguage();
+  const isMobile = useMobile();
   const [portfolio, setPortfolio] = useState({ bio: '', ent: '', english: '', skills: [], achievements: [] });
   const [loading, setLoading] = useState(true);
   const [editingItem, setEditingItem] = useState(null);
@@ -296,10 +298,10 @@ export default function Portfolio() {
         />
       </div>
 
-      <div className="grid-layout" style={{ padding: 32, display: 'grid', gridTemplateColumns: '1fr 320px', gap: 24, maxWidth: 1200, margin: '0 auto' }}>
+      <div className="grid-layout" style={{ padding: isMobile ? 16 : 32, display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 320px', gap: 24, maxWidth: 1200, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
         <div>
 
-          <div className="stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 28 }}>
+          <div className="stats-row" style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 12, marginBottom: 28 }}>
             {[
               { v: '87%', l: t('port_avg_match') },
               { v: Array.isArray(portfolio.achievements) ? portfolio.achievements.length : 0, l: t('port_achievements_count') },

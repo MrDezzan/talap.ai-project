@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useMobile } from '../hooks/useMobile';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../components/Icon';
 import Button from '../components/Button';
@@ -60,6 +61,7 @@ export default function Quiz() {
   const navigate = useNavigate();
   const { analyzeProfile } = useAuth();
   const { t, lang } = useLanguage();
+  const isMobile = useMobile();
   
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -122,7 +124,7 @@ export default function Quiz() {
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: C.mist }}>
-      <div style={{ maxWidth: 800, width: '100%', margin: '0 auto', padding: '40px 24px 80px' }}>
+      <div style={{ maxWidth: 800, width: '100%', margin: '0 auto', padding: isMobile ? '20px 16px 80px' : '40px 24px 80px', boxSizing: 'border-box' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <button 
@@ -158,7 +160,7 @@ export default function Quiz() {
           </h1>
           <p style={{ fontFamily: C.font, fontSize: 16, color: C.ink500, marginBottom: 40 }}>Выбери один вариант, который лучше всего тебя описывает.</p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 12 : 20 }}>
             {currentQ.options.map((opt, i) => (
               <button
                 key={opt.id}

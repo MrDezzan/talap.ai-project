@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useMobile } from '../hooks/useMobile';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../components/Icon';
 import TopBar from '../components/TopBar';
@@ -112,6 +113,7 @@ function GrantDetailModal({ grant, onClose, t, lang }) {
 export default function Grants() {
   const navigate = useNavigate();
   const { t, lang } = useLanguage();
+  const isMobile = useMobile();
   const [grants, setGrants] = useState([]);
   const [portfolio, setPortfolio] = useState({});
   const [loading, setLoading] = useState(true);
@@ -165,7 +167,7 @@ export default function Grants() {
         }
       />
 
-      <div style={{ padding: 32 }}>
+      <div style={{ padding: isMobile ? 16 : 32 }}>
         
         <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
           {FILTERS.map(f => (
@@ -175,7 +177,7 @@ export default function Grants() {
           <Chip dot tone="ai" onClick={() => navigate('/chat')}>{t('grants_ai_match')}</Chip>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 320px', gap: 24 }}>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {filtered.map(g => (
