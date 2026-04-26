@@ -1,16 +1,90 @@
-# React + Vite
+# Talap.ai — AI-ассистент для твоей карьеры
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Talap.ai** — это современная платформа, которая помогает студентам и молодым специалистам найти свой профессиональный путь, подобрать подходящие гранты и построить пошаговый план развития с помощью искусственного интеллекта.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Основные возможности (Features)
 
-## React Compiler
+### 1. 🤖 Персональный AI-ассистент
+Искусственный интеллект анализирует твой профиль (навыки, достижения, интересы) и формирует уникальную стратегию развития.
+- **AI-подбор**: Автоматический поиск наиболее подходящих профессий и грантов.
+- **Match-процент**: Визуализация того, насколько ты подходишь под требования конкретного гранта или профессии.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 2. 🗺️ Динамический Роадмап (Roadmap)
+Генерация пошагового плана достижения карьерной цели.
+- **Этапы обучения**: Каждый шаг содержит описание, рекомендуемую длительность и полезные ресурсы.
+- **Индивидуальность**: План строится на основе твоих текущих знаний и желаемой цели.
 
-## Expanding the ESLint configuration
+### 3. 📂 Интеллектуальное Портфолио
+Централизованное хранилище твоих достижений.
+- **Сбор данных**: Удобные формы для добавления навыков, академических результатов (ЕНТ/UNT) и наград.
+- **Экспорт в PDF**: Возможность мгновенно создать красивое резюме на основе данных портфолио.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 4. 🔎 Умный Живой Поиск (Live Search)
+Мгновенный поиск по всей базе знаний платформы.
+- **Быстрый доступ**: Вызывается горячими клавишами `Cmd + K`.
+- **Категоризация**: Результаты разделены на профессии и гранты с мгновенным предпросмотром.
+
+### 5. 💬 AI-Консультант (Chat)
+Интерактивный чат для решения любых карьерных вопросов.
+- **Автоматическое резюме**: ИИ может сам составить текст твоего CV на основе диалога и портфолио.
+- **Подбор ресурсов**: Попроси AI найти курсы или подготовить план подготовки к экзаменам.
+
+### 6. 🌐 Мультиязычность
+Полная локализация интерфейса на три языка:
+- **Русский**
+- **Қазақ тілі**
+- **English**
+
+### 7. 🎓 Каталоги профессий и грантов
+Обширные базы данных с удобной фильтрацией по категориям, странам и суммам.
+- **Дедлайны**: Отслеживание ближайших сроков подачи заявок на гранты.
+- **Тренды**: Информация о зарплатах и востребованности профессий.
+
+---
+
+## Технологический стек
+
+### Frontend
+- **React 18** + **Vite** (быстрая сборка и HMR)
+- **Vanilla CSS** (премиальный кастомный дизайн, адаптивность)
+- **Lucide React** (современная иконографика)
+- **Context API** (управление состоянием, авторизация, локализация)
+
+### Backend
+- **Go (Golang)** (высокопроизводительный сервер)
+- **PostgreSQL** (надежное хранение данных)
+- **OpenAI API** (интеграция продвинутых моделей ИИ)
+- **JWT** (безопасная авторизация)
+
+---
+
+## Как запустить проект
+
+### 1. Требования
+- Node.js (v18+)
+- Go (1.21+)
+- PostgreSQL
+
+### 2. Установка
+1. Клонируйте репозиторий:
+   ```bash
+   git clone https://github.com/MrDezzan/talap.ai-project.git
+   ```
+
+2. Запуск бэкенда:
+   ```bash
+   cd backend
+   go run .
+   ```
+
+3. Запуск фронтенда:
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+---
+
+*Разработано с акцентом на UX/UI и мощь современных AI-технологий.*
