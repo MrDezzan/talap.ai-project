@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useMobile } from '../hooks/useMobile';
 import Button from '../components/Button';
 import Icon from '../components/Icon';
 import Progress from '../components/Progress';
@@ -17,6 +18,7 @@ const C = {
 
 function Field({ label, type = 'text', value, onChange, placeholder, error, hint, autoFocus }) {
   const [focused, setFocused] = useState(false);
+  const isMobile = useMobile();
   return (
     <div style={{ marginBottom: 16 }}>
       <label style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, display: 'block', marginBottom: 6 }}>
@@ -27,7 +29,7 @@ function Field({ label, type = 'text', value, onChange, placeholder, error, hint
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        autoFocus={autoFocus}
+        autoFocus={!isMobile && autoFocus}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         style={{
@@ -76,6 +78,7 @@ function SelectField({ label, value, onChange, options, error, t }) {
 }
 
 function AnalyzingScreen({ name, lang }) {
+  const isMobile = useMobile();
   const STAGES = [
     { icon: 'user',      text: lang === 'en' ? 'Studying your profile...' : lang === 'kz' ? 'Профильіңізді зерттеу...' : 'Изучаю твой профиль...',        sub: lang === 'en' ? 'Analyzing interests and goals' : lang === 'kz' ? 'Қызығушылықтар мен мақсаттарды талдау' : 'Анализирую интересы и цели' },
     { icon: 'compass',   text: lang === 'en' ? 'Picking professions...' : lang === 'kz' ? 'Мамандықтар таңдау...' : 'Подбираю профессии...',          sub: lang === 'en' ? 'Calculating matches' : lang === 'kz' ? 'Сәйкестікті есептеу' : 'Считаю совпадение с твоими данными' },
@@ -116,24 +119,8 @@ function AnalyzingScreen({ name, lang }) {
 
   return (
     <div style={{ width: '100%', maxWidth: 480 }}>
-      <style>{`
-        @keyframes pulse-ring {
-          0%, 100% { transform: scale(1); opacity: 0.6; }
-          50% { transform: scale(1.15); opacity: 0.2; }
-        }
-        @keyframes fade-in-up {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
-
-      <div style={{ background: C.paper, borderRadius: 20, padding: 40, border: `1px solid ${C.hairline}`, boxShadow: '0 8px 32px rgba(10,18,48,0.06)', textAlign: 'center' }}>
+      <div style={{ background: C.paper, borderRadius: 20, padding: isMobile ? 24 : 40, border: `1px solid ${C.hairline}`, boxShadow: '0 8px 32px rgba(10,18,48,0.06)', textAlign: 'center' }}>
         <div style={{ position: 'relative', width: 80, height: 80, margin: '0 auto 28px' }}>
-          <div style={{
-            position: 'absolute', inset: -8, borderRadius: 9999,
-            background: 'rgba(20,72,255,0.1)',
-            animation: 'pulse-ring 2s ease-in-out infinite',
-          }} />
           <div style={{
             width: 80, height: 80, borderRadius: 9999,
             background: `conic-gradient(${C.blue} ${progress * 3.6}deg, ${C.blue50} 0deg)`,
@@ -149,7 +136,7 @@ function AnalyzingScreen({ name, lang }) {
           </div>
         </div>
 
-        <div style={{ fontFamily: C.font, fontSize: 22, fontWeight: 700, color: C.ink900, marginBottom: 6 }}>
+        <div style={{ fontFamily: C.font, fontSize: isMobile ? 20 : 22, fontWeight: 700, color: C.ink900, marginBottom: 6 }}>
           {done ? (lang === 'en' ? `Ready, ${name}!` : lang === 'kz' ? `Дайын, ${name}!` : `Готово, ${name}!`) : STAGES[stage].text}
         </div>
         <div style={{ fontFamily: C.font, fontSize: 14, color: C.ink500, marginBottom: 32, minHeight: 20 }}>
@@ -174,8 +161,6 @@ function AnalyzingScreen({ name, lang }) {
                 style={{
                   display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', borderRadius: 8,
                   background: isActive ? C.blue50 : 'transparent',
-                  transition: 'background 300ms',
-                  animation: isActive ? 'fade-in-up 0.3s ease' : 'none',
                 }}
               >
                 <div style={{
@@ -192,6 +177,7 @@ function AnalyzingScreen({ name, lang }) {
                   fontFamily: C.font, fontSize: 13,
                   color: isDone ? C.ink900 : isActive ? C.blue : C.ink300,
                   fontWeight: isDone || isActive ? 600 : 400,
+                  textAlign: 'left'
                 }}>
                   {s.text.replace('...', '')}
                 </span>
@@ -205,18 +191,43 @@ function AnalyzingScreen({ name, lang }) {
 }
 
 export default function Register() {
-  const { login, register, analyzeProfile } = useAuth();
+  const { user, login, register, analyzeProfile, updateUser } = useAuth();
   const { t, lang } = useLanguage();
   const navigate = useNavigate();
+  const isMobile = useMobile();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [analyzingName, setAnalyzingName] = useState('');
   const submittingRef = useRef(false);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const stepParam = params.get('step');
+    if (stepParam === '1' || (user && !user.grade)) {
+      setStep(1);
+    }
+  }, [user]);
+
   const [form, setForm] = useState({
-    name: '', email: '', password: '',
-    grade: '', city: '', interests: [],
+    name: user?.name || '', 
+    email: user?.email || '', 
+    password: '',
+    grade: user?.grade || '', 
+    city: user?.city || '', 
+    interests: [],
   });
+
+  useEffect(() => {
+    if (user) {
+      setForm(f => ({
+        ...f,
+        name: user.name || f.name,
+        email: user.email || f.email,
+        grade: user.grade || f.grade,
+        city: user.city || f.city,
+      }));
+    }
+  }, [user]);
   const [errors, setErrors] = useState({});
 
   const set = (field) => (e) => {
@@ -260,7 +271,6 @@ export default function Register() {
                     lang === 'kz' ? ['Математика', 'Информатика', 'Биология', 'Физика', 'Химия', 'Тарих', 'Тілдер', 'Экономика', 'Дизайн', 'Спорт'] :
                     ['Математика', 'Информатика', 'Биология', 'Физика', 'Химия', 'История', 'Языки', 'Экономика', 'Дизайн', 'Спорт'];
 
-
   const nextStep = async () => {
     if (step === 0) {
       const errs = validateStep0();
@@ -278,11 +288,20 @@ export default function Register() {
       setLoading(true);
       const email = form.email.trim().toLowerCase();
       try {
-        const regRes = await register(form.name, email, form.password, form.grade, form.city);
-        if (regRes.error) throw regRes;
+        if (user) {
+          await updateUser({
+            name: form.name,
+            grade: form.grade,
+            city: form.city,
+            interests: form.interests
+          });
+        } else {
+          const regRes = await register(form.name, email, form.password, form.grade, form.city);
+          if (regRes.error) throw regRes;
 
-        const loginRes = await login(email, form.password);
-        if (loginRes.error) throw loginRes;
+          const loginRes = await login(email, form.password);
+          if (loginRes.error) throw loginRes;
+        }
 
         setAnalyzingName(form.name.split(' ')[0]);
         setStep(2);
@@ -329,7 +348,7 @@ export default function Register() {
     return (
       <div style={{
         minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: C.mist, padding: 'clamp(16px, 5vw, 24px)',
+        background: C.mist, padding: '16px', boxSizing: 'border-box'
       }}>
         <AnalyzingScreen name={analyzingName} lang={lang} />
       </div>
@@ -340,15 +359,15 @@ export default function Register() {
     <div style={{ 
       width: '100%', 
       maxWidth: 480,
-      padding: '0 16px',
+      padding: isMobile ? '0 8px' : '0 16px',
       boxSizing: 'border-box'
     }}>
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
-        <h1 style={{ fontFamily: C.font, fontSize: 'clamp(24px, 5vw, 28px)', fontWeight: 800, letterSpacing: '-0.025em', color: C.ink900, margin: '0 0 8px' }}>
+        <h1 style={{ fontFamily: C.font, fontSize: isMobile ? 24 : 28, fontWeight: 800, letterSpacing: '-0.025em', color: C.ink900, margin: '0 0 8px' }}>
           {t('auth_register_title')}
         </h1>
         <p style={{ fontFamily: C.font, fontSize: 15, color: C.ink500, margin: 0 }}>
-          {lang === 'en' ? `Step ${step + 1} of 2 — takes 2 mins` : lang === 'kz' ? `${step + 1}-ші қадам — 2 минут алады` : `Шаг ${step + 1} из 2 — займёт 2 минуты`}
+          {lang === 'en' ? `Step ${step + 1} of 2` : lang === 'kz' ? `${step + 1}-ші қадам` : `Шаг ${step + 1} из 2`}
         </p>
       </div>
 
@@ -365,7 +384,7 @@ export default function Register() {
       <div style={{ 
         background: C.paper, 
         borderRadius: 16, 
-        padding: 'clamp(20px, 5vw, 32px)', 
+        padding: isMobile ? 20 : 32, 
         border: `1px solid ${C.hairline}`, 
         boxShadow: '0 8px 32px rgba(10,18,48,0.06)',
         width: '100%',
@@ -385,7 +404,7 @@ export default function Register() {
             <SelectField label={t('settings_city')} value={form.city} onChange={set('city')} options={CITIES} error={errors.city} t={t} />
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, marginBottom: 10 }}>
-                {lang === 'en' ? 'Interests' : lang === 'kz' ? 'Қызығушылықтар' : 'Интересы'} <span style={{ color: C.ink300, fontWeight: 400 }}>({lang === 'en' ? 'optional' : lang === 'kz' ? 'міндетті емес' : 'по желанию'})</span>
+                {lang === 'en' ? 'Interests' : lang === 'kz' ? 'Қызығушылықтар' : 'Интересы'}
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {INTERESTS.map(i => {
@@ -409,7 +428,6 @@ export default function Register() {
                 })}
               </div>
             </div>
-            {errors.grade && <div style={{ fontFamily: C.font, fontSize: 12, color: C.error700, marginBottom: 12 }}>{errors.grade}</div>}
           </>
         )}
 
@@ -419,7 +437,7 @@ export default function Register() {
 
         {step === 0 && (
           <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '24px 0' }}>
               <div style={{ flex: 1, height: 1, background: C.hairline }} />
               <span style={{ fontFamily: C.font, fontSize: 12, color: C.ink300 }}>{t('auth_or')}</span>
               <div style={{ flex: 1, height: 1, background: C.hairline }} />

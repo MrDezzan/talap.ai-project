@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useMobile } from '../hooks/useMobile';
 import Button from '../components/Button';
 
 const C = {
@@ -14,6 +15,8 @@ const C = {
 
 function Field({ label, type = 'text', value, onChange, placeholder, error, autoFocus }) {
   const [focused, setFocused] = useState(false);
+  const isMobile = useMobile();
+  
   return (
     <div style={{ marginBottom: 16 }}>
       <label style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, display: 'block', marginBottom: 6 }}>
@@ -24,7 +27,7 @@ function Field({ label, type = 'text', value, onChange, placeholder, error, auto
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        autoFocus={autoFocus}
+        autoFocus={!isMobile && autoFocus}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         style={{
@@ -45,6 +48,7 @@ export default function Login() {
   const { login, loginWithToken } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const isMobile = useMobile();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -57,8 +61,12 @@ export default function Login() {
       localStorage.setItem('token', token);
       const sync = async () => {
         try {
-          await loginWithToken(token);
-          navigate('/dashboard');
+          const userData = await loginWithToken(token);
+          if (!userData.grade) {
+            navigate('/register?step=1');
+          } else {
+            navigate('/dashboard');
+          }
         } catch (e) {
           console.error('Sync failed', e);
         }
@@ -86,7 +94,6 @@ export default function Login() {
   };
 
   const handleGoogleLogin = () => {
-    console.log("Google Login clicked");
     let apiBase = import.meta.env.VITE_API_URL || '/api';
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       apiBase = 'http://localhost:8080/api';
@@ -95,17 +102,15 @@ export default function Login() {
     window.location.href = url;
   };
 
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
-
   return (
     <div style={{ 
       width: '100%', 
       maxWidth: 440,
-      padding: '0 16px',
+      padding: isMobile ? '0 8px' : '0 16px',
       boxSizing: 'border-box'
     }}>
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
-        <h1 style={{ fontFamily: C.font, fontSize: 'clamp(24px, 5vw, 28px)', fontWeight: 800, letterSpacing: '-0.025em', color: C.ink900, margin: '0 0 8px' }}>
+        <h1 style={{ fontFamily: C.font, fontSize: isMobile ? 24 : 28, fontWeight: 800, letterSpacing: '-0.025em', color: C.ink900, margin: '0 0 8px' }}>
           {t('auth_welcome')}
         </h1>
         <p style={{ fontFamily: C.font, fontSize: 15, color: C.ink500, margin: 0 }}>
@@ -116,7 +121,7 @@ export default function Login() {
       <div style={{ 
         background: C.paper, 
         borderRadius: 16, 
-        padding: 'clamp(20px, 5vw, 32px)', 
+        padding: isMobile ? 20 : 32, 
         border: `1px solid ${C.hairline}`, 
         boxShadow: '0 8px 32px rgba(10,18,48,0.06)',
         width: '100%',

@@ -3,6 +3,7 @@ import Icon from '../components/Icon';
 import Button from '../components/Button';
 import Chip from '../components/Chip';
 import { useLanguage } from '../context/LanguageContext';
+import { useMobile } from '../hooks/useMobile';
 import avatar1 from '../assets/avatar1.png';
 import avatar2 from '../assets/avatar2.png';
 import avatar3 from '../assets/avatar3.png';
@@ -42,47 +43,52 @@ function LanguageSwitcher() {
 
 function Navbar() {
   const { t } = useLanguage();
+  const isMobile = useMobile();
   return (
     <header style={{
       position: 'sticky', top: 0, zIndex: 100,
       background: 'rgba(255,255,255,0.88)', backdropFilter: 'blur(20px)',
       borderBottom: `1px solid ${C.hairline}`,
     }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px', height: 64, display: 'flex', alignItems: 'center', gap: 40 }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 16px' : '0 40px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', flexShrink: 0 }}>
-<span style={{ fontFamily: C.font, fontSize: 18, fontWeight: 800, letterSpacing: '-0.03em', color: C.ink900 }}>
+          <span style={{ fontFamily: C.font, fontSize: 18, fontWeight: 800, letterSpacing: '-0.03em', color: C.ink900 }}>
             Talap<span style={{ color: C.blue }}>.</span>ai
           </span>
         </Link>
 
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 4, flex: 1 }}>
-          {[
-            { label: t('land_nav_features'), href: '#Возможности' },
-            { label: t('land_nav_how'), href: '#how' },
-            { label: t('land_nav_grants'), href: '/grants' },
-          ].map(item => (
-            item.href.startsWith('/') ? (
-              <Link key={item.label} to={item.href} style={{
-                fontFamily: C.font, fontSize: 14, fontWeight: 500, color: C.ink700,
-                padding: '6px 12px', borderRadius: 6, textDecoration: 'none',
-                transition: 'color 150ms',
-              }}>{item.label}</Link>
-            ) : (
-              <a key={item.label} href={item.href} style={{
-                fontFamily: C.font, fontSize: 14, fontWeight: 500, color: C.ink700,
-                padding: '6px 12px', borderRadius: 6, textDecoration: 'none',
-                transition: 'color 150ms',
-              }}>{item.label}</a>
-            )
-          ))}
-        </nav>
+        {!isMobile && (
+          <nav style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            {[
+              { label: t('land_nav_features'), href: '#Возможности' },
+              { label: t('land_nav_how'), href: '#how' },
+              { label: t('land_nav_grants'), href: '/grants' },
+            ].map(item => (
+              item.href.startsWith('/') ? (
+                <Link key={item.label} to={item.href} style={{
+                  fontFamily: C.font, fontSize: 14, fontWeight: 500, color: C.ink700,
+                  padding: '6px 12px', borderRadius: 6, textDecoration: 'none',
+                  transition: 'color 150ms',
+                }}>{item.label}</Link>
+              ) : (
+                <a key={item.label} href={item.href} style={{
+                  fontFamily: C.font, fontSize: 14, fontWeight: 500, color: C.ink700,
+                  padding: '6px 12px', borderRadius: 6, textDecoration: 'none',
+                  transition: 'color 150ms',
+                }}>{item.label}</a>
+              )
+            ))}
+          </nav>
+        )}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 8 : 16 }}>
           <LanguageSwitcher />
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Link to="/login">
-              <Button variant="ghost" size="sm" style={{ color: C.ink700 }}>{t('land_nav_login')}</Button>
-            </Link>
+            {!isMobile && (
+              <Link to="/login">
+                <Button variant="ghost" size="sm" style={{ color: C.ink700 }}>{t('land_nav_login')}</Button>
+              </Link>
+            )}
             <Link to="/register">
               <Button variant="primary" size="sm">{t('land_nav_start')}</Button>
             </Link>
@@ -96,41 +102,17 @@ function Navbar() {
 function Hero() {
   const navigate = useNavigate();
   const { t, lang } = useLanguage();
+  const isMobile = useMobile();
   return (
     <div style={{ position: 'relative', overflow: 'hidden' }}>
-      <style>{`
-        @keyframes talap-blob-1 {
-          0%, 100% { transform: translate(0px, 0px) scale(1) rotate(0deg); }
-          33%       { transform: translate(90px, -70px) scale(1.12) rotate(130deg); }
-          66%       { transform: translate(-60px, 80px) scale(0.92) rotate(260deg); }
-        }
-        @keyframes talap-blob-2 {
-          0%, 100% { transform: translate(0px, 0px) scale(1) rotate(0deg); }
-          40%       { transform: translate(-110px, 60px) scale(1.18) rotate(-150deg); }
-          75%       { transform: translate(70px, -90px) scale(0.88) rotate(-300deg); }
-        }
-        @keyframes talap-blob-3 {
-          0%, 100% { transform: translate(0px, 0px) scale(1); }
-          50%       { transform: translate(50px, 70px) scale(1.22); }
-        }
-      `}</style>
-      <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
-        <div style={{
-          position: 'absolute', top: '5%', left: '15%',
-          width: 720, height: 380,
-          background: 'radial-gradient(ellipse, rgba(20,72,255,0.08) 0%, transparent 68%)',
-          filter: 'blur(80px)',
-        }} />
-      </div>
-
-      <section style={{ padding: '96px 40px 80px', maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
+      <section style={{ padding: isMobile ? '48px 16px' : '96px 40px 80px', maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 48 : 64, alignItems: 'center' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 32 }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 {[avatar1, avatar2, avatar3, avatar4].map((av, i) => (
                   <div key={i} style={{ 
-                    width: 40, height: 40, borderRadius: 9999, border: '2px solid white', 
+                    width: isMobile ? 32 : 40, height: isMobile ? 32 : 40, borderRadius: 9999, border: '2px solid white', 
                     marginLeft: i === 0 ? 0 : -12, overflow: 'hidden', background: '#F5F7FB',
                     boxShadow: '0 4px 12px rgba(10,18,48,0.1)'
                   }}>
@@ -140,37 +122,45 @@ function Hero() {
               </div>
               <div>
                 <div style={{ display: 'flex', gap: 2, marginBottom: 4 }}>
-                  {[...Array(5)].map((_, i) => <Icon key={i} name="star" size={14} color="#F2C572" style={{ fill: '#F2C572' }} />)}
+                  {[...Array(5)].map((_, i) => <Icon key={i} name="star" size={12} color="#F2C572" style={{ fill: '#F2C572' }} />)}
                 </div>
-                <div style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700 }}>
+                <div style={{ fontFamily: C.font, fontSize: isMobile ? 11 : 13, fontWeight: 600, color: C.ink700 }}>
                   {t('land_social_rating')}
                 </div>
               </div>
             </div>
-            <h1 style={{ fontFamily: C.font, fontSize: 56, lineHeight: '60px', fontWeight: 800, letterSpacing: '-0.035em', color: C.ink900, margin: '0 0 24px' }}>
+            <h1 style={{ 
+              fontFamily: C.font, 
+              fontSize: isMobile ? 36 : 56, 
+              lineHeight: isMobile ? '42px' : '60px', 
+              fontWeight: 800, 
+              letterSpacing: '-0.035em', 
+              color: C.ink900, 
+              margin: '0 0 24px' 
+            }}>
               {t('land_hero_title1')}<br />
               <span style={{ color: C.blue }}>{t('land_hero_title2')}</span>
             </h1>
-            <p style={{ fontFamily: C.font, fontSize: 18, lineHeight: '28px', color: C.ink700, margin: '0 0 40px', maxWidth: 480 }}>
+            <p style={{ fontFamily: C.font, fontSize: isMobile ? 16 : 18, lineHeight: isMobile ? '24px' : '28px', color: C.ink700, margin: '0 0 40px', maxWidth: 480 }}>
               {t('land_hero_desc')}
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              <Link to="/register">
-                <Button variant="primary" size="lg" icon="arrowRight">{t('land_hero_btn_start')}</Button>
+              <Link to="/register" style={{ flex: isMobile ? 1 : 'initial' }}>
+                <Button variant="primary" size="lg" icon="arrowRight" fullWidth={isMobile}>{t('land_hero_btn_start')}</Button>
               </Link>
-              <a href="#how">
-                <Button variant="outline" size="lg">{t('land_hero_btn_how')}</Button>
+              <a href="#how" style={{ flex: isMobile ? 1 : 'initial' }}>
+                <Button variant="outline" size="lg" fullWidth={isMobile}>{t('land_hero_btn_how')}</Button>
               </a>
             </div>
-            <div style={{ display: 'flex', gap: 24, marginTop: 40 }}>
+            <div style={{ display: 'flex', gap: isMobile ? 16 : 24, marginTop: 40 }}>
               {[
                 { value: '50 000+', label: t('land_hero_stats_students') },
                 { value: '1 200+', label: t('land_hero_stats_grants') },
                 { value: '95%', label: t('land_hero_stats_success') },
               ].map(s => (
                 <div key={s.label}>
-                  <div style={{ fontFamily: C.font, fontSize: 24, fontWeight: 800, letterSpacing: '-0.025em', color: C.ink900 }}>{s.value}</div>
-                  <div style={{ fontFamily: C.font, fontSize: 13, color: C.ink500, marginTop: 2 }}>{s.label}</div>
+                  <div style={{ fontFamily: C.font, fontSize: isMobile ? 20 : 24, fontWeight: 800, letterSpacing: '-0.025em', color: C.ink900 }}>{s.value}</div>
+                  <div style={{ fontFamily: C.font, fontSize: isMobile ? 11 : 13, color: C.ink500, marginTop: 2 }}>{s.label}</div>
                 </div>
               ))}
             </div>
@@ -182,7 +172,7 @@ function Hero() {
               background: 'radial-gradient(60% 60% at 50% 50%, rgba(20,72,255,0.08), transparent)',
             }} />
             <div style={{
-              borderRadius: 20, padding: 24,
+              borderRadius: 20, padding: isMobile ? 20 : 24,
               background: 'white',
               boxShadow: '0 32px 80px rgba(10,18,48,0.14), 0 0 0 1px rgba(10,18,48,0.06)',
               position: 'relative',
@@ -210,10 +200,10 @@ function Hero() {
                   { name: 'AI Engineer', m: 87 },
                   { name: 'Product-менеджер', m: 74 },
                 ].map(p => (
-                  <div key={p.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-                    <span style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink900 }}>{p.name}</span>
+                  <div key={p.name} style={{ display: 'grid', gridTemplateColumns: '1fr auto', alignItems: 'center', gap: 12, marginTop: 10 }}>
+                    <span style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink900, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div style={{ width: 80, height: 4, background: C.mist2, borderRadius: 9999, overflow: 'hidden' }}>
+                      <div style={{ width: isMobile ? 60 : 80, height: 4, background: C.mist2, borderRadius: 9999, overflow: 'hidden' }}>
                         <div style={{ width: `${p.m}%`, height: '100%', background: C.blue, borderRadius: 9999 }} />
                       </div>
                       <span style={{ fontFamily: '"Geist Mono",monospace', fontSize: 11, fontWeight: 600, color: C.blue, width: 32 }}>{p.m}%</span>
@@ -221,7 +211,7 @@ function Hero() {
                   </div>
                 ))}
               </div>
-              <div style={{ display: 'flex', gap: 6 }}>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 <Chip onClick={() => navigate('/grants')}>{t('nav_grants')}</Chip>
                 <Chip onClick={() => navigate('/roadmap')}>{t('cat_modal_build_path')}</Chip>
               </div>
@@ -235,6 +225,7 @@ function Hero() {
 
 function Features() {
   const { t, lang } = useLanguage();
+  const isMobile = useMobile();
   const features = [
     {
       icon: 'compass',
@@ -287,20 +278,20 @@ function Features() {
   ];
 
   return (
-    <section id="Возможности" style={{ padding: '80px 40px', background: C.mist }}>
+    <section id="Возможности" style={{ padding: isMobile ? '64px 16px' : '80px 40px', background: C.mist }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 56 }}>
           <Chip>{t('land_nav_features')}</Chip>
-          <h2 style={{ fontFamily: C.font, fontSize: 40, fontWeight: 800, letterSpacing: '-0.03em', color: C.ink900, margin: '16px 0 16px' }}>
+          <h2 style={{ fontFamily: C.font, fontSize: isMobile ? 32 : 40, fontWeight: 800, letterSpacing: '-0.03em', color: C.ink900, margin: '16px 0 16px' }}>
             {t('land_features_title')}
           </h2>
-          <p style={{ fontFamily: C.font, fontSize: 17, color: C.ink700, maxWidth: 520, margin: '0 auto' }}>
+          <p style={{ fontFamily: C.font, fontSize: isMobile ? 15 : 17, color: C.ink700, maxWidth: 520, margin: '0 auto' }}>
             {t('land_features_desc')}
           </p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 20 }}>
           {features.map((f, i) => (
-            <div key={i} style={{ background: C.paper, borderRadius: 16, padding: 28, border: `1px solid ${C.hairline}`, transition: 'transform 200ms, box-shadow 200ms' }}>
+            <div key={i} style={{ background: C.paper, borderRadius: 16, padding: isMobile ? 24 : 28, border: `1px solid ${C.hairline}`, transition: 'transform 200ms, box-shadow 200ms' }}>
               <div style={{ width: 48, height: 48, borderRadius: 12, background: f.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
                 <Icon name={f.icon} size={24} color={f.color} strokeWidth={1.75} />
               </div>
@@ -316,6 +307,7 @@ function Features() {
 
 function HowItWorks() {
   const { t, lang } = useLanguage();
+  const isMobile = useMobile();
   const steps = [
     { n: '01', title: lang === 'en' ? 'Tell about yourself' : lang === 'kz' ? 'Өзің туралы айт' : 'Расскажи о себе', desc: lang === 'en' ? 'Fill out your profile: grade, grades, interests.' : lang === 'kz' ? 'Профильді толтыр: сынып, бағалар, қызығушылықтар.' : 'Заполни профиль: класс, оценки, интересы.' },
     { n: '02', title: lang === 'en' ? 'Take the test' : lang === 'kz' ? 'Тест тапсыр' : 'Пройди тест', desc: lang === 'en' ? '24 questions and Talap AI picks professions.' : lang === 'kz' ? '24 сұрақ — Talap AI мамандық таңдайды.' : '24 вопроса — и Talap AI подберёт профессии.' },
@@ -323,18 +315,18 @@ function HowItWorks() {
     { n: '04', title: lang === 'en' ? 'Take action' : lang === 'kz' ? 'Әрекет ет' : 'Действуй', desc: lang === 'en' ? 'Apply, collect portfolio, ask AI.' : lang === 'kz' ? 'Өтінім бер, портфолио жина, AI-дан сұра.' : 'Подавай заявки, собирай портфолио, задавай вопросы AI.' },
   ];
   return (
-    <section id="how" style={{ padding: '80px 40px' }}>
+    <section id="how" style={{ padding: isMobile ? '64px 16px' : '80px 40px' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 56 }}>
           <Chip>{t('land_nav_how')}</Chip>
-          <h2 style={{ fontFamily: C.font, fontSize: 40, fontWeight: 800, letterSpacing: '-0.03em', color: C.ink900, margin: '16px 0 16px' }}>
+          <h2 style={{ fontFamily: C.font, fontSize: isMobile ? 32 : 40, fontWeight: 800, letterSpacing: '-0.03em', color: C.ink900, margin: '16px 0 16px' }}>
             {lang === 'en' ? 'Four steps to your dream career' : lang === 'kz' ? 'Арман мансабына төрт қадам' : 'Четыре шага до карьеры мечты'}
           </h2>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0, position: 'relative' }}>
-          <div style={{ position: 'absolute', top: 28, left: '12.5%', right: '12.5%', height: 1, background: `linear-gradient(90deg, ${C.blue}, ${C.blue}66)` }} />
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: isMobile ? 32 : 0, position: 'relative' }}>
+          {!isMobile && <div style={{ position: 'absolute', top: 28, left: '12.5%', right: '12.5%', height: 1, background: `linear-gradient(90deg, ${C.blue}, ${C.blue}66)` }} />}
           {steps.map((s, i) => (
-            <div key={i} style={{ padding: '0 20px', textAlign: 'center' }}>
+            <div key={i} style={{ padding: isMobile ? 0 : '0 20px', textAlign: 'center' }}>
               <div style={{
                 width: 56, height: 56, borderRadius: 9999, background: i === 0 ? C.blue : 'white',
                 border: `2px solid ${i === 0 ? C.blue : C.hairline}`,
@@ -356,6 +348,7 @@ function HowItWorks() {
 
 function Testimonials() {
   const { lang } = useLanguage();
+  const isMobile = useMobile();
   const testimonials = [
     {
       text: lang === 'en' ? 'Thanks to Talap found Bolashak and entered UK master program.' : lang === 'kz' ? 'Talap арқасында Болашақ грантын тауып, Ұлыбританияға магистратураға түстім.' : 'Благодаря Talap нашла грант Болашак и поступила в магистратуру в Великобритании.',
@@ -371,17 +364,17 @@ function Testimonials() {
     },
   ];
   return (
-    <section style={{ padding: '80px 40px', background: C.mist }}>
+    <section style={{ padding: isMobile ? '64px 16px' : '80px 40px', background: C.mist }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 56 }}>
           <Chip tone="success" dot>{lang === 'en' ? 'Success Stories' : lang === 'kz' ? 'Жетістік тарихы' : 'Истории успеха'}</Chip>
-          <h2 style={{ fontFamily: C.font, fontSize: 40, fontWeight: 800, letterSpacing: '-0.03em', color: C.ink900, margin: '16px 0 0' }}>
+          <h2 style={{ fontFamily: C.font, fontSize: isMobile ? 32 : 40, fontWeight: 800, letterSpacing: '-0.03em', color: C.ink900, margin: '16px 0 0' }}>
             {lang === 'en' ? 'They already found their way' : lang === 'kz' ? 'Олар өз жолын тапты' : 'Они уже нашли свой путь'}
           </h2>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 20 }}>
           {testimonials.map((t, i) => (
-            <div key={i} style={{ background: 'white', borderRadius: 16, padding: 28, border: `1px solid ${C.hairline}` }}>
+            <div key={i} style={{ background: 'white', borderRadius: 16, padding: isMobile ? 24 : 28, border: `1px solid ${C.hairline}` }}>
               <div style={{ display: 'flex', gap: 2, marginBottom: 16 }}>
                 {[...Array(5)].map((_, j) => <Icon key={j} name="star" size={16} color="#F2C572" style={{ fill: '#F2C572' }} />)}
               </div>
@@ -403,19 +396,20 @@ function Testimonials() {
 
 function CTABanner() {
   const { t } = useLanguage();
+  const isMobile = useMobile();
   return (
-    <section style={{ padding: '80px 40px' }}>
+    <section style={{ padding: isMobile ? '48px 16px' : '80px 40px' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <div style={{ borderRadius: 24, padding: '64px 80px', textAlign: 'center', background: C.blue50 }}>
-          <h2 style={{ fontFamily: C.font, fontSize: 44, fontWeight: 800, letterSpacing: '-0.03em', color: C.ink900, margin: '0 0 16px' }}>
+        <div style={{ borderRadius: 24, padding: isMobile ? '48px 24px' : '64px 80px', textAlign: 'center', background: C.blue50 }}>
+          <h2 style={{ fontFamily: C.font, fontSize: isMobile ? 32 : 44, fontWeight: 800, letterSpacing: '-0.03em', color: C.ink900, margin: '0 0 16px' }}>
             {t('land_cta_title')}
           </h2>
-          <p style={{ fontFamily: C.font, fontSize: 17, color: C.ink700, margin: '0 0 36px', maxWidth: 520, marginLeft: 'auto', marginRight: 'auto' }}>
+          <p style={{ fontFamily: C.font, fontSize: isMobile ? 15 : 17, color: C.ink700, margin: '0 0 36px', maxWidth: 520, marginLeft: 'auto', marginRight: 'auto' }}>
             {t('land_cta_desc')}
           </p>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-            <Link to="/register"><Button variant="primary" size="lg" icon="arrowRight">{t('land_cta_btn_profile')}</Button></Link>
-            <Link to="/login"><Button variant="outline" size="lg">{t('land_cta_btn_login')}</Button></Link>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexDirection: isMobile ? 'column' : 'row' }}>
+            <Link to="/register"><Button variant="primary" size="lg" icon="arrowRight" fullWidth={isMobile}>{t('land_cta_btn_profile')}</Button></Link>
+            <Link to="/login"><Button variant="outline" size="lg" fullWidth={isMobile}>{t('land_cta_btn_login')}</Button></Link>
           </div>
         </div>
       </div>
@@ -425,10 +419,11 @@ function CTABanner() {
 
 function Footer() {
   const { lang } = useLanguage();
+  const isMobile = useMobile();
   return (
-    <footer style={{ background: C.ink900, padding: '56px 40px 40px' }}>
+    <footer style={{ background: C.ink900, padding: isMobile ? '40px 16px' : '56px 40px 40px' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <div style={{ borderTop: '1px solid #2A3457', paddingTop: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ borderTop: '1px solid #2A3457', paddingTop: 24, display: 'flex', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', flexDirection: isMobile ? 'column' : 'row', gap: 16 }}>
           <div style={{ fontFamily: C.font, fontSize: 13, color: '#5A6485' }}>© 2026 Talap.ai. {lang === 'en' ? 'All rights reserved.' : lang === 'kz' ? 'Барлық құқықтар қорғалған.' : 'Все права защищены.'}</div>
           <div style={{ fontFamily: C.font, fontSize: 13, color: '#5A6485' }}>{lang === 'en' ? 'Astana, Kazakhstan' : 'Астана, Казахстан'} 🇰🇿</div>
         </div>
