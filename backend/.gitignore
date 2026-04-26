@@ -1,0 +1,10 @@
+# Environment & secrets
+.env
+*.env.local
+
+# Build output
+main
+talkd-backend
+
+# macOS
+.DS_Store
