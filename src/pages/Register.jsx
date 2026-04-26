@@ -316,11 +316,17 @@ export default function Register() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+    const url = apiBase.startsWith('http') ? `${apiBase}/api/auth/google/login` : `/api/auth/google/login`;
+    window.location.href = url;
+  };
+
   if (step === 2) {
     return (
       <div style={{
         minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: C.mist, padding: 24,
+        background: C.mist, padding: 'clamp(16px, 5vw, 24px)',
       }}>
         <AnalyzingScreen name={analyzingName} lang={lang} />
       </div>
@@ -328,9 +334,14 @@ export default function Register() {
   }
 
   return (
-    <div style={{ width: '100%', maxWidth: 480 }}>
+    <div style={{ 
+      width: '100%', 
+      maxWidth: 480,
+      padding: '0 16px',
+      boxSizing: 'border-box'
+    }}>
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
-        <h1 style={{ fontFamily: C.font, fontSize: 28, fontWeight: 800, letterSpacing: '-0.025em', color: C.ink900, margin: '0 0 8px' }}>
+        <h1 style={{ fontFamily: C.font, fontSize: 'clamp(24px, 5vw, 28px)', fontWeight: 800, letterSpacing: '-0.025em', color: C.ink900, margin: '0 0 8px' }}>
           {t('auth_register_title')}
         </h1>
         <p style={{ fontFamily: C.font, fontSize: 15, color: C.ink500, margin: 0 }}>
@@ -348,7 +359,15 @@ export default function Register() {
         ))}
       </div>
 
-      <div style={{ background: C.paper, borderRadius: 16, padding: 32, border: `1px solid ${C.hairline}`, boxShadow: '0 8px 32px rgba(10,18,48,0.06)' }}>
+      <div style={{ 
+        background: C.paper, 
+        borderRadius: 16, 
+        padding: 'clamp(20px, 5vw, 32px)', 
+        border: `1px solid ${C.hairline}`, 
+        boxShadow: '0 8px 32px rgba(10,18,48,0.06)',
+        width: '100%',
+        boxSizing: 'border-box'
+      }}>
         {step === 0 && (
           <>
             <Field label={t('auth_name_label')} value={form.name} onChange={set('name')} placeholder="Айдана Серикова" error={errors.name} autoFocus />
@@ -371,12 +390,14 @@ export default function Register() {
                   return (
                     <button
                       key={i}
+                      type="button"
                       onClick={() => toggleInterest(i)}
                       style={{
                         padding: '6px 12px', borderRadius: 4, border: `1px solid ${active ? C.blue : C.hairline}`,
                         background: active ? C.blue100 : C.paper, color: active ? C.blue : C.ink700,
                         fontFamily: C.font, fontSize: 13, fontWeight: 600, cursor: 'pointer',
                         transition: 'all 150ms',
+                        WebkitTapHighlightColor: 'transparent',
                       }}
                     >
                       {i}
@@ -400,11 +421,16 @@ export default function Register() {
               <span style={{ fontFamily: C.font, fontSize: 12, color: C.ink300 }}>{t('auth_or')}</span>
               <div style={{ flex: 1, height: 1, background: C.hairline }} />
             </div>
-            <button style={{
-              width: '100%', padding: '11px 16px', borderRadius: 8, border: `1px solid ${C.hairline}`,
-              background: C.paper, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-              fontFamily: C.font, fontSize: 15, fontWeight: 600, color: C.ink900, cursor: 'pointer',
-            }}>
+            <button 
+              type="button"
+              onClick={handleGoogleLogin}
+              style={{
+                width: '100%', padding: '11px 16px', borderRadius: 8, border: `1px solid ${C.hairline}`,
+                background: C.paper, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                fontFamily: C.font, fontSize: 15, fontWeight: 600, color: C.ink900, cursor: 'pointer',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
               <svg width="18" height="18" viewBox="0 0 18 18">
                 <path d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.06-.66-.15-1.17z" fill="#4285F4"/>
                 <path d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2.01c-.72.48-1.63.77-2.7.77-2.08 0-3.84-1.4-4.47-3.29H1.83v2.07A8 8 0 0 0 8.98 17z" fill="#34A853"/>

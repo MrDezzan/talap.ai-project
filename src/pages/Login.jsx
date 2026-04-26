@@ -105,9 +105,14 @@ export default function Login() {
   };
 
   return (
-    <div style={{ width: '100%', maxWidth: 440 }}>
+    <div style={{ 
+      width: '100%', 
+      maxWidth: 440,
+      padding: '0 16px',
+      boxSizing: 'border-box'
+    }}>
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
-        <h1 style={{ fontFamily: C.font, fontSize: 28, fontWeight: 800, letterSpacing: '-0.025em', color: C.ink900, margin: '0 0 8px' }}>
+        <h1 style={{ fontFamily: C.font, fontSize: 'clamp(24px, 5vw, 28px)', fontWeight: 800, letterSpacing: '-0.025em', color: C.ink900, margin: '0 0 8px' }}>
           {t('auth_welcome')}
         </h1>
         <p style={{ fontFamily: C.font, fontSize: 15, color: C.ink500, margin: 0 }}>
@@ -115,7 +120,15 @@ export default function Login() {
         </p>
       </div>
 
-      <div style={{ background: C.paper, borderRadius: 16, padding: 32, border: `1px solid ${C.hairline}`, boxShadow: '0 8px 32px rgba(10,18,48,0.06)' }}>
+      <div style={{ 
+        background: C.paper, 
+        borderRadius: 16, 
+        padding: 'clamp(20px, 5vw, 32px)', 
+        border: `1px solid ${C.hairline}`, 
+        boxShadow: '0 8px 32px rgba(10,18,48,0.06)',
+        width: '100%',
+        boxSizing: 'border-box'
+      }}>
         <form onSubmit={handleSubmit} noValidate>
           <Field
             label={t('auth_email_label')}
@@ -158,6 +171,8 @@ export default function Login() {
             background: C.paper, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
             fontFamily: C.font, fontSize: 15, fontWeight: 600, color: C.ink900, cursor: 'pointer',
             transition: 'background-color 150ms',
+            userSelect: 'none',
+            WebkitTapHighlightColor: 'transparent',
           }}
           onMouseOver={e => e.currentTarget.style.background = C.mist}
           onMouseOut={e => e.currentTarget.style.background = C.paper}
@@ -170,6 +185,7 @@ export default function Login() {
           </svg>
           {t('auth_google')}
         </button>
+      </div>
       </div>
 
       <p style={{ textAlign: 'center', fontFamily: C.font, fontSize: 14, color: C.ink500, marginTop: 24 }}>

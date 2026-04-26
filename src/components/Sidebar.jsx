@@ -23,6 +23,44 @@ export default function Sidebar() {
     { to: '/chat',        label: t('nav_chat'),          icon: 'sparkles' },
   ];
   return (
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+
+  if (isMobile) {
+    return (
+      <nav style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0,
+        height: 64, background: '#FFFFFF', borderTop: '1px solid #E4E8F1',
+        display: 'flex', justifyContent: 'space-around', alignItems: 'center',
+        padding: '0 8px', zIndex: 1000, boxShadow: '0 -2px 10px rgba(0,0,0,0.05)'
+      }}>
+        {navItems.map(item => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            style={({ isActive }) => ({
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+              textDecoration: 'none', color: isActive ? '#1448FF' : '#5A6485',
+              fontFamily: 'var(--font-sans)', fontSize: 10, fontWeight: isActive ? 600 : 500,
+              flex: 1, padding: '8px 0'
+            })}
+          >
+            {({ isActive }) => (
+              <>
+                <Icon name={item.icon} size={20} strokeWidth={isActive ? 2 : 1.75} />
+                <span style={{ fontSize: 10 }}>{item.label}</span>
+              </>
+            )}
+          </NavLink>
+        ))}
+        <Link to="/settings" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textDecoration: 'none', color: '#5A6485', flex: 1 }}>
+          <Avatar name={user?.name || 'U'} size={20} />
+          <span style={{ fontSize: 10 }}>{t('nav_settings')}</span>
+        </Link>
+      </nav>
+    );
+  }
+
+  return (
     <aside style={{
       width: 240,
       height: '100%',

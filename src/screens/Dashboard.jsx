@@ -61,6 +61,8 @@ export default function Dashboard() {
 
   const topGrant = aiProfile?.grants?.[0];
 
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+
   return (
     <div style={{ flex: 1, overflow: 'auto', background: C.mist, display: 'flex', flexDirection: 'column' }}>
       <TopBar
@@ -86,7 +88,7 @@ export default function Dashboard() {
               
               {showNotifications && (
                 <div style={{
-                  position: 'absolute', top: 44, right: 0, width: 300, background: 'white',
+                  position: 'absolute', top: 44, right: isMobile ? -60 : 0, width: isMobile ? 260 : 300, background: 'white',
                   borderRadius: 12, boxShadow: '0 10px 30px rgba(10,18,48,0.15)',
                   border: `1px solid ${C.hairline}`, zIndex: 100, padding: 12
                 }}>
@@ -117,15 +119,21 @@ export default function Dashboard() {
         }
       />
 
-      <div style={{ padding: 32, display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24, minHeight: 0 }}>
+      <div style={{ 
+        padding: isMobile ? 16 : 32, 
+        display: 'grid', 
+        gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr', 
+        gap: 24, 
+        minHeight: 0 
+      }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
-          <Mesh intensity={0.85} style={{ borderRadius: 16, padding: 28, minHeight: 200 }}>
+          <Mesh intensity={0.85} style={{ borderRadius: 16, padding: isMobile ? 20 : 28, minHeight: 200 }}>
             <Chip dot tone="ai" style={{ background: 'rgba(255,255,255,0.2)', color: 'white', backdropFilter: 'blur(10px)' }}>
               {t('grants_ai_tip')}
             </Chip>
             <div style={{
-              fontFamily: C.font, fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em',
+              fontFamily: C.font, fontSize: isMobile ? 22 : 26, fontWeight: 700, letterSpacing: '-0.025em',
               lineHeight: 1.2, marginTop: 16, maxWidth: 540, color: 'white',
             }}>
               {aiProfile
@@ -141,7 +149,7 @@ export default function Dashboard() {
                   : aiProfile.summary)
                 : t('dash_hero_no_auth_desc')}
             </div>
-            <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+            <div style={{ display: 'flex', gap: 10, marginTop: 20, flexWrap: 'wrap' }}>
               {aiProfile
                 ? <>
                     <Button variant="primary" style={{ background: 'white', color: C.blue }} onClick={() => navigate('/grants')}>
@@ -158,7 +166,7 @@ export default function Dashboard() {
             </div>
           </Mesh>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 16 }}>
             {stats.map((s, i) => (
               <Card key={i}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -188,15 +196,15 @@ export default function Dashboard() {
                   {t('all')} →
                 </span>
               </div>
-              <Card padding={0}>
+              <Card padding={0} style={{ overflowX: 'auto' }}>
                 {aiProfile.grants.map((g, i) => (
                   <div
                     key={i}
                     style={{
                       padding: '16px 20px',
                       display: 'grid',
-                      gridTemplateColumns: '1fr 100px 130px 100px',
-                      gap: 16, alignItems: 'center',
+                      gridTemplateColumns: isMobile ? '1fr' : '1fr 100px 130px 100px',
+                      gap: 16, alignItems: isMobile ? 'flex-start' : 'center',
                       borderBottom: i < aiProfile.grants.length - 1 ? `1px solid ${C.hairline}` : 'none',
                     }}
                   >
@@ -211,7 +219,7 @@ export default function Dashboard() {
                     <Chip tone={g.tone || toneFor(g.deadline_days)} dot>
                       {t('dash_days_left')} {g.deadline_days} {t('days')}
                     </Chip>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <div style={{ display: isMobile ? 'none' : 'flex', justifyContent: 'flex-end' }}>
                       <Button variant="outline" size="sm" onClick={() => navigate('/grants')}>{t('dash_open')}</Button>
                     </div>
                   </div>
@@ -225,7 +233,7 @@ export default function Dashboard() {
               <div style={{ fontFamily: C.font, fontSize: 16, fontWeight: 700, letterSpacing: '-0.015em', color: C.ink900, marginBottom: 14 }}>
                 {t('dash_professions_title')}
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 12 }}>
                 {aiProfile.professions.map((p, i) => (
                   <Card key={i} padding={18} onClick={() => navigate('/professions')} style={{ cursor: 'pointer' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
@@ -250,6 +258,7 @@ export default function Dashboard() {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Roadmap and others... */}
 
           {aiProfile?.roadmap?.length > 0 ? (
             <Card>
