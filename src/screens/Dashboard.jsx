@@ -116,7 +116,7 @@ export default function Dashboard() {
                       Спросить AI
                     </Button>
                   </>
-                : <Button variant="primary" style={{ background: 'white', color: C.blue }} onClick={() => navigate('/professions')}>
+                : <Button variant="primary" style={{ background: 'white', color: C.blue }} onClick={() => navigate('/quiz')}>
                     Пройти тест профориентации
                   </Button>
               }
@@ -252,7 +252,7 @@ export default function Dashboard() {
               </div>
               <div style={{ fontFamily: C.font, fontSize: 12, color: C.ink500, marginTop: 4 }}>8 вопросов · ~3 мин · AI-анализ</div>
               <Progress value={0} style={{ marginTop: 12 }} />
-              <Button variant="primary" size="sm" style={{ marginTop: 14, width: '100%' }} onClick={() => navigate('/professions')}>Начать тест</Button>
+              <Button variant="primary" size="sm" style={{ marginTop: 14, width: '100%' }} onClick={() => navigate('/quiz')}>Начать тест</Button>
             </Card>
           )}
 
@@ -287,8 +287,8 @@ export default function Dashboard() {
           )}
 
           <Mesh intensity={0.45} style={{ borderRadius: 12, padding: 18 }}>
-            <Chip dot tone="ai">Talap AI</Chip>
-            <div style={{ fontFamily: C.font, fontSize: 14, fontWeight: 600, color: C.ink900, marginTop: 10, lineHeight: 1.4 }}>
+            <Chip dot tone="ai" style={{ background: 'rgba(255,255,255,0.15)', color: 'white' }}>Talap AI</Chip>
+            <div style={{ fontFamily: C.font, fontSize: 14, fontWeight: 600, color: 'white', marginTop: 10, lineHeight: 1.4 }}>
               {aiProfile?.summary
                 ? aiProfile.summary
                 : '«Какую профессию выбрать, если люблю математику и рисование?»'}

@@ -20,6 +20,7 @@ import Chat from './screens/Chat';
 import Grants from './screens/Grants';
 import Portfolio from './screens/Portfolio';
 import Profile from './screens/Profile';
+import Quiz from './screens/Quiz';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -51,6 +52,7 @@ export default function App() {
               <Route path="/roadmap" element={<Roadmap />} />
               <Route path="/portfolio" element={<Portfolio />} />
               <Route path="/chat" element={<Chat />} />
+              <Route path="/quiz" element={<Quiz />} />
               <Route path="/settings" element={<Profile />} />
             </Route>
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Icon from '../components/Icon';
 import TopBar from '../components/TopBar';
 import Card from '../components/Card';
@@ -23,6 +23,19 @@ export default function Profile() {
     city: user?.city || '',
     school: user?.school || '',
   });
+
+  // Sync with user context when it loads
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || '',
+        grade: user.grade || '',
+        city: user.city || '',
+        school: user.school || '',
+      });
+    }
+  }, [user]);
+
   const [loading, setLoading] = useState(false);
 
   const save = async () => {

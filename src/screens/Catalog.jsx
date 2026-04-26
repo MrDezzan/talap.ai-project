@@ -128,7 +128,7 @@ export default function Catalog() {
         actions={
           <>
             <Search value={search} onChange={setSearch} placeholder={t('cat_search_label')} />
-            <Button variant="primary" icon="sparkles" size="md" onClick={() => navigate('/chat')}>{t('cat_quiz_btn')}</Button>
+            <Button variant="primary" icon="sparkles" size="md" onClick={() => navigate('/quiz')}>{t('cat_quiz_btn')}</Button>
           </>
         }
       />

@@ -32,9 +32,16 @@ function ProfileModal({ onClose, onSave, initialData }) {
   const [skills, setSkills] = useState(initialData.skills || []);
   const [newSkill, setNewSkill] = useState('');
 
-  const handleSave = () => {
-    onSave({ ...initialData, bio, ent, english, skills });
-    onClose();
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await onSave({ ...initialData, bio, ent, english, skills });
+      onClose();
+    } finally {
+      setSaving(false);
+    }
   };
 
   const addSkill = () => {
@@ -92,8 +99,10 @@ function ProfileModal({ onClose, onSave, initialData }) {
             </div>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
-            <Button variant="outline" style={{ flex: 1 }} onClick={onClose}>Отмена</Button>
-            <Button variant="primary" style={{ flex: 2 }} onClick={handleSave}>Сохранить изменения</Button>
+            <Button variant="outline" style={{ flex: 1 }} onClick={onClose} disabled={saving}>Отмена</Button>
+            <Button variant="primary" style={{ flex: 2 }} onClick={handleSave} disabled={saving}>
+              {saving ? 'Анализируем...' : 'Сохранить изменения'}
+            </Button>
           </div>
         </div>
       </div>
@@ -116,18 +125,25 @@ function AchievementModal({ onClose, onSave, onDelete, initialData }) {
     boxShadow: focused === name ? '0 0 0 3px rgba(20,72,255,0.08)' : 'none',
   });
 
-  const handleSave = () => {
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
     if (!title || !org) return;
-    onSave({
-      id: initialData?.id || Date.now(),
-      title,
-      org,
-      year,
-      rank,
-      icon: initialData?.icon || 'bookOpen',
-      tone: initialData?.tone || 'blue',
-    });
-    onClose();
+    setSaving(true);
+    try {
+      await onSave({
+        id: initialData?.id || Date.now(),
+        title,
+        org,
+        year,
+        rank,
+        icon: initialData?.icon || 'bookOpen',
+        tone: initialData?.tone || 'blue',
+      });
+      onClose();
+    } finally {
+      setSaving(false);
+    }
   };
 
   const years = [];
@@ -171,8 +187,8 @@ function AchievementModal({ onClose, onSave, onDelete, initialData }) {
                 Удалить
               </Button>
             )}
-            <Button variant="primary" size="md" style={{ flex: initialData ? 2 : 1 }} onClick={handleSave}>
-              {initialData ? 'Сохранить' : 'Добавить'}
+            <Button variant="primary" size="md" style={{ flex: initialData ? 2 : 1 }} onClick={handleSave} disabled={saving}>
+              {saving ? '...' : (initialData ? 'Сохранить' : 'Добавить')}
             </Button>
           </div>
         </div>
@@ -182,7 +198,7 @@ function AchievementModal({ onClose, onSave, onDelete, initialData }) {
 }
 
 export default function Portfolio() {
-  const { user } = useAuth();
+  const { user, analyzeProfile } = useAuth();
   const [portfolio, setPortfolio] = useState({ bio: '', ent: '', english: '', skills: [], achievements: [] });
   const [loading, setLoading] = useState(true);
   const [editingItem, setEditingItem] = useState(null);
@@ -191,14 +207,45 @@ export default function Portfolio() {
 
   useEffect(() => {
     api.get('/api/portfolio')
-      .then(d => { setPortfolio({ bio: '', ent: '', english: '', skills: [], achievements: [], ...d }); setLoading(false); })
+      .then(d => {
+        let achievements = d.achievements || [];
+        if (typeof achievements === 'string') {
+          try { achievements = JSON.parse(achievements); } catch (e) { achievements = []; }
+        }
+        
+        let aiResult = d.ai_result;
+        if (typeof aiResult === 'string') {
+          try { aiResult = JSON.parse(aiResult); } catch (e) { aiResult = null; }
+        }
+
+        let skills = d.skills || [];
+        if (typeof skills === 'string') {
+          try { 
+            if (skills.startsWith('{')) {
+              // Handle Postgres array format {a,b,c}
+              skills = skills.slice(1, -1).split(',').filter(x => x);
+            } else {
+              skills = JSON.parse(skills); 
+            }
+          } catch (e) { skills = []; }
+        }
+
+        setPortfolio({ 
+          bio: '', ent: '', english: '', 
+          ...d, 
+          skills: Array.isArray(skills) ? skills : [],
+          achievements: Array.isArray(achievements) ? achievements : [],
+          ai_result: aiResult
+        }); 
+        setLoading(false); 
+      })
       .catch(() => setLoading(false));
   }, []);
 
   const savePortfolio = (updated) => {
     setPortfolio(updated);
-    api.put('/api/portfolio', updated).then(() => {
-      api.post('/api/ai/analyze', {}).catch(console.error);
+    return api.put('/api/portfolio', updated).then(() => {
+      return analyzeProfile({});
     }).catch(console.error);
   };
 
@@ -214,9 +261,9 @@ export default function Portfolio() {
     savePortfolio({ ...portfolio, achievements: newAchievements });
   };
 
-  const deleteAchievement = (id) => {
+  const deleteAchievement = async (id) => {
     const safeAchievements = Array.isArray(portfolio.achievements) ? portfolio.achievements : [];
-    savePortfolio({ ...portfolio, achievements: safeAchievements.filter(a => a.id !== id) });
+    await savePortfolio({ ...portfolio, achievements: safeAchievements.filter(a => a.id !== id) });
   };
 
   if (loading) return null;

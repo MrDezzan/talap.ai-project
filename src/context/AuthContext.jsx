@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { api } from '../lib/api';
 
 const AuthContext = createContext(null);
@@ -24,6 +24,37 @@ export function AuthProvider({ children }) {
     }
   });
 
+  const fetchMe = async () => {
+    try {
+      const data = await api.get('/api/me');
+      setUser(data);
+      localStorage.setItem('talap_user', JSON.stringify(data));
+    } catch (err) {
+      console.error('Failed to fetch user data:', err);
+    }
+  };
+
+  const fetchAIProfile = async () => {
+    try {
+      const data = await api.get('/api/portfolio');
+      if (data && data.ai_result) {
+        let parsed = data.ai_result;
+        if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+        setAiProfile(parsed);
+        localStorage.setItem('talap_ai_profile', JSON.stringify(parsed));
+      }
+    } catch (err) {
+      console.error('Failed to fetch AI profile:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchMe();
+      fetchAIProfile();
+    }
+  }, []); // Only on initial mount if user exists
+
   const login = async (email, password) => {
     setLoading(true);
     try {
@@ -33,17 +64,17 @@ export function AuthProvider({ children }) {
       setUser(data.user);
       return data;
     } catch (err) {
-      return { error: err.message };
+      return { error: err.message, status: err.status };
     } finally {
       setLoading(false);
     }
   };
 
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, grade, city) => {
     try {
-      return await api.post('/api/register', { name, email, password });
+      return await api.post('/api/register', { name, email, password, grade, city });
     } catch (err) {
-      return { error: err.message };
+      return { error: err.message, status: err.status };
     }
   };
 
@@ -54,7 +85,7 @@ export function AuthProvider({ children }) {
       localStorage.setItem('talap_ai_profile', JSON.stringify(data));
       return data;
     } catch (err) {
-      return { error: err.message };
+      return { error: err.message, status: err.status };
     }
   };
 

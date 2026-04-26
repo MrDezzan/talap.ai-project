@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -75,7 +75,7 @@ function SelectField({ label, value, onChange, options, error, t }) {
   );
 }
 
-function AnalyzingScreen({ name, t, lang }) {
+function AnalyzingScreen({ name, lang }) {
   const STAGES = [
     { icon: 'user',      text: lang === 'en' ? 'Studying your profile...' : lang === 'kz' ? 'Профильіңізді зерттеу...' : 'Изучаю твой профиль...',        sub: lang === 'en' ? 'Analyzing interests and goals' : lang === 'kz' ? 'Қызығушылықтар мен мақсаттарды талдау' : 'Анализирую интересы и цели' },
     { icon: 'compass',   text: lang === 'en' ? 'Picking professions...' : lang === 'kz' ? 'Мамандықтар таңдау...' : 'Подбираю профессии...',          sub: lang === 'en' ? 'Calculating matches' : lang === 'kz' ? 'Сәйкестікті есептеу' : 'Считаю совпадение с твоими данными' },
@@ -211,6 +211,7 @@ export default function Register() {
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [analyzingName, setAnalyzingName] = useState('');
+  const submittingRef = useRef(false);
 
   const [form, setForm] = useState({
     name: '', email: '', password: '',
@@ -269,16 +270,19 @@ export default function Register() {
     }
 
     if (step === 1) {
+      if (submittingRef.current) return;
       const errs = validateStep1();
       if (Object.keys(errs).length) { setErrors(errs); return; }
 
+      submittingRef.current = true;
       setLoading(true);
+      const email = form.email.trim().toLowerCase();
       try {
-        const regRes = await register(form.name, form.email, form.password);
-        if (regRes.error) throw new Error(regRes.error);
+        const regRes = await register(form.name, email, form.password, form.grade, form.city);
+        if (regRes.error) throw regRes;
 
-        const loginRes = await login(form.email, form.password);
-        if (loginRes.error) throw new Error(loginRes.error);
+        const loginRes = await login(email, form.password);
+        if (loginRes.error) throw loginRes;
 
         setAnalyzingName(form.name.split(' ')[0]);
         setStep(2);
@@ -299,8 +303,15 @@ export default function Register() {
 
         navigate('/dashboard');
       } catch (err) {
-        setErrors({ grade: err.message || 'Ошибка регистрации. Попробуй снова.' });
+        if (err.status === 409) {
+          setStep(0);
+          setErrors({ email: err.error || err.message || (lang === 'en' ? 'Email already registered' : 'Этот email уже зарегистрирован') });
+        } else {
+          setErrors({ grade: err.message || 'Ошибка регистрации. Попробуй снова.' });
+        }
         setLoading(false);
+      } finally {
+        submittingRef.current = false;
       }
     }
   };
@@ -311,7 +322,7 @@ export default function Register() {
         minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
         background: C.mist, padding: 24,
       }}>
-        <AnalyzingScreen name={analyzingName} t={t} lang={lang} />
+        <AnalyzingScreen name={analyzingName} lang={lang} />
       </div>
     );
   }
@@ -378,7 +389,7 @@ export default function Register() {
           </>
         )}
 
-        <Button variant="primary" size="lg" fullWidth onClick={nextStep} style={{ marginTop: 8 }}>
+        <Button variant="primary" size="lg" fullWidth onClick={nextStep} style={{ marginTop: 8 }} disabled={loading}>
           {loading ? (lang === 'en' ? 'Loading...' : lang === 'kz' ? 'Жүктелуде...' : 'Загрузка...') : step === 1 ? t('auth_register_btn') : (lang === 'en' ? 'Continue' : lang === 'kz' ? 'Жалғастыру' : 'Продолжить')}
         </Button>
 

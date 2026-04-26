@@ -14,10 +14,11 @@ const VARIANTS = {
   ai:       { background: 'white', color: '#0A1230', border: '1px solid #E4E8F1', boxShadow: '0 0 0 4px rgba(20,72,255,0.06), 0 4px 16px rgba(34,211,238,0.16)' },
 };
 
-export default function Button({ children, variant = 'primary', size = 'md', icon, fullWidth, onClick, style = {} }) {
+export default function Button({ children, variant = 'primary', size = 'md', icon, fullWidth, onClick, disabled, style = {} }) {
   return (
     <button
-      onClick={onClick}
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
       style={{
         ...SIZES[size],
         ...VARIANTS[variant],
@@ -30,7 +31,8 @@ export default function Button({ children, variant = 'primary', size = 'md', ico
         alignItems: 'center',
         justifyContent: 'center',
         gap: 8,
-        cursor: 'pointer',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.6 : 1,
         transition: 'all 200ms cubic-bezier(0.2,0.8,0.2,1)',
         ...style,
       }}

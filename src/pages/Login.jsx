@@ -114,7 +114,7 @@ export default function Login() {
               {t('auth_forgot_pass')}
             </Link>
           </div>
-          <Button variant="primary" size="lg" fullWidth onClick={handleSubmit} style={{ opacity: loading ? 0.7 : 1 }}>
+          <Button variant="primary" size="lg" fullWidth onClick={handleSubmit} disabled={loading}>
             {loading ? t('auth_logging_in') : t('auth_login_btn')}
           </Button>
         </form>

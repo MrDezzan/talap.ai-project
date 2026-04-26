@@ -10,8 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "docx": "^9.6.1",
+    "file-saver": "^2.0.5",
+    "lucide-react": "^1.11.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^7.14.2"
   },
   "devDependencies": {

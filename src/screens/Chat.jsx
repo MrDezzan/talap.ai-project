@@ -7,10 +7,15 @@ import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { useChat } from '../context/ChatContext';
 import { useLanguage } from '../context/LanguageContext';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { generateCV } from '../lib/docx';
 
 const C = {
   ink900: '#0A1230', ink700: '#2A3457', ink500: '#5A6485', ink300: '#9AA3BF',
   blue: '#1448FF', blue50: '#F2F5FF', blue100: '#E6ECFF',
+  userMsg: '#F3F4FF',
+  userMsgText: '#312E81',
   paper: '#FFFFFF', mist: '#F5F7FB', hairline: '#E4E8F1',
   font: 'var(--font-sans)',
 };
@@ -51,6 +56,7 @@ export default function Chat() {
   } = useChat();
   
   const bottomRef = useRef(null);
+  const scrollRef = useRef(null);
 
   useEffect(() => {
     fetchThreads();
@@ -73,7 +79,18 @@ export default function Chat() {
   const isTyping = activeThreadId ? (typing[activeThreadId] || false) : false;
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const scrollToBottom = () => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
+    };
+    
+    const timer = setTimeout(() => {
+      scrollToBottom();
+      requestAnimationFrame(scrollToBottom);
+    }, 150);
+    
+    return () => clearTimeout(timer);
   }, [messages, isTyping]);
 
   const send = async (text) => {
@@ -130,8 +147,8 @@ export default function Chat() {
   };
 
   return (
-    <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '280px 1fr', background: '#FFFFFF' }}>
-      <div style={{ borderRight: `1px solid ${C.hairline}`, display: 'flex', flexDirection: 'column', background: C.mist }}>
+    <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '280px 1fr', background: '#FFFFFF', height: '100%', minHeight: 0 }}>
+      <div style={{ borderRight: `1px solid ${C.hairline}`, display: 'flex', flexDirection: 'column', background: C.mist, height: '100%', minHeight: 0 }}>
         <div style={{ padding: 20 }}>
           <Button variant="outline" fullWidth icon="plus" onClick={startNew}>{t('chat_new')}</Button>
         </div>
@@ -156,8 +173,8 @@ export default function Chat() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', position: 'relative', height: '100%' }}>
-        <div style={{ flex: 1, overflow: 'auto', padding: '40px 0' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', position: 'relative', height: '100%', minHeight: 0 }}>
+        <div ref={scrollRef} style={{ flex: 1, overflow: 'auto', padding: '40px 0', minHeight: 0 }}>
           <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 24px' }}>
             {messages.length === 0 && (
               <div style={{ textAlign: 'center', marginTop: 40 }}>
@@ -174,21 +191,52 @@ export default function Chat() {
             )}
 
             {messages.map((m, i) => (
-              <div key={i} style={{ marginBottom: 32, display: 'flex', gap: 20, flexDirection: m.ai ? 'row' : 'row-reverse' }}>
-                <div style={{ flexShrink: 0 }}>
+              <div key={i} style={{ marginBottom: 32, display: 'flex', gap: 16, flexDirection: m.ai ? 'row' : 'row-reverse' }}>
+                <div style={{ flexShrink: 0, marginTop: 4 }}>
                   <Avatar name={m.ai ? 'Talap' : user?.name} size={36} tone={m.ai ? 'ai' : 'default'} />
                 </div>
-                <div style={{ flex: 1, maxWidth: '85%' }}>
-                  <div style={{
-                    fontFamily: C.font, fontSize: 15, lineHeight: '1.6', color: m.ai ? C.ink900 : '#FFFFFF',
-                    background: m.ai ? 'transparent' : C.blue,
-                    padding: m.ai ? '0' : '12px 18px',
-                    borderRadius: m.ai ? '0' : '16px 4px 16px 16px',
-                    whiteSpace: 'pre-wrap'
+                <div style={{ flex: 1, maxWidth: '80%', display: 'flex', flexDirection: 'column', alignItems: m.ai ? 'flex-start' : 'flex-end' }}>
+                  <div style={{ 
+                    fontFamily: C.font, fontSize: 13, fontWeight: 700, 
+                    color: m.ai ? C.ink700 : C.ink500, 
+                    marginBottom: 6,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6
                   }}>
-                    {m.text}
+                    {m.ai ? 'Talap.ai' : (user?.name || 'Вы')}
+                    {m.ai && <div style={{ width: 4, height: 4, borderRadius: 2, background: C.blue }} />}
+                  </div>
+                  <div style={{
+                    fontFamily: C.font, fontSize: 15, lineHeight: '1.6', 
+                    color: m.ai ? C.ink900 : C.userMsgText,
+                    background: m.ai ? 'transparent' : C.userMsg,
+                    padding: m.ai ? '0' : '14px 20px',
+                    borderRadius: m.ai ? '0' : '16px 4px 16px 16px',
+                    boxShadow: m.ai ? 'none' : '0 2px 8px rgba(79, 70, 229, 0.04)',
+                    border: m.ai ? 'none' : `1px solid ${C.blue100}`,
+                    width: m.ai ? '100%' : 'auto'
+                  }}>
+                    <div className="prose">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {m.text}
+                      </ReactMarkdown>
+                    </div>
                   </div>
                   {m.roadmap && <RoadmapMessage steps={m.roadmap} />}
+                  {m.cv_data && Object.keys(m.cv_data).length > 0 && (
+                    <div style={{ marginTop: 12 }}>
+                      <Button 
+                        variant="outline" 
+                        size="md" 
+                        icon="award" 
+                        onClick={() => generateCV(m.cv_data)}
+                        style={{ borderColor: C.blue, color: C.blue }}
+                      >
+                        Скачать CV (.docx)
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
