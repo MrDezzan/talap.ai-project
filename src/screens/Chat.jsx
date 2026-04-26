@@ -107,7 +107,7 @@ export default function Chat() {
     setTyping(prev => ({ ...prev, [currentTid]: true }));
 
     try {
-      const data = await api.post('/api/ai/chat', { 
+      const data = await api.post('/ai/chat', { 
         thread_id: serverTid, message: msg, 
         user_info: { name: user?.name, grade: user?.grade, city: user?.city, summary: aiProfile?.summary, top_profession: aiProfile?.top_profession },
         history: messages.slice(-6).map(m => ({ role: m.ai ? 'assistant' : 'user', content: m.text }))

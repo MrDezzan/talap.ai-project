@@ -210,7 +210,7 @@ export default function Portfolio() {
   const [showProfileEdit, setShowProfileEdit] = useState(false);
 
   useEffect(() => {
-    api.get('/api/portfolio')
+    api.get('/portfolio')
       .then(d => {
         let achievements = d.achievements || [];
         if (typeof achievements === 'string') {
@@ -248,7 +248,7 @@ export default function Portfolio() {
 
   const savePortfolio = (updated) => {
     setPortfolio(updated);
-    return api.put('/api/portfolio', updated).then(() => {
+    return api.put('/portfolio', updated).then(() => {
       return analyzeProfile({});
     }).catch(console.error);
   };

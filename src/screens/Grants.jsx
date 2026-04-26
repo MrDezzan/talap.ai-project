@@ -134,8 +134,8 @@ export default function Grants() {
     if (query) setSearch(query);
 
     Promise.all([
-      api.get('/api/grants'),
-      api.get('/api/portfolio')
+      api.get('/grants'),
+      api.get('/portfolio')
     ])
       .then(([grantsData, portfolioData]) => {
         setGrants(grantsData);

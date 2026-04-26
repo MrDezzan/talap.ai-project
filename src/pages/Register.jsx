@@ -317,8 +317,11 @@ export default function Register() {
   };
 
   const handleGoogleLogin = () => {
-    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-    const url = apiBase.startsWith('http') ? `${apiBase}/api/auth/google/login` : `/api/auth/google/login`;
+    let apiBase = import.meta.env.VITE_API_URL || '/api';
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      apiBase = 'http://localhost:8080/api';
+    }
+    const url = apiBase.startsWith('http') ? `${apiBase}/auth/google/login` : `${apiBase}/auth/google/login`;
     window.location.href = url;
   };
 

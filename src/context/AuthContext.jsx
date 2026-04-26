@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
 
   const fetchMe = async () => {
     try {
-      const data = await api.get('/api/me');
+      const data = await api.get('/me');
       setUser(data);
       localStorage.setItem('talap_user', JSON.stringify(data));
     } catch (err) {
@@ -36,7 +36,7 @@ export function AuthProvider({ children }) {
 
   const fetchAIProfile = async () => {
     try {
-      const data = await api.get('/api/portfolio');
+      const data = await api.get('/portfolio');
       if (data && data.ai_result) {
         let parsed = data.ai_result;
         if (typeof parsed === 'string') parsed = JSON.parse(parsed);
@@ -58,7 +58,7 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     setLoading(true);
     try {
-      const data = await api.post('/api/login', { email, password });
+      const data = await api.post('/login', { email, password });
       localStorage.setItem('token', data.token);
       localStorage.setItem('talap_user', JSON.stringify(data.user));
       setUser(data.user);
@@ -72,7 +72,7 @@ export function AuthProvider({ children }) {
 
   const register = async (name, email, password, grade, city) => {
     try {
-      return await api.post('/api/register', { name, email, password, grade, city });
+      return await api.post('/register', { name, email, password, grade, city });
     } catch (err) {
       return { error: err.message, status: err.status };
     }
@@ -80,7 +80,7 @@ export function AuthProvider({ children }) {
 
   const analyzeProfile = async (profileData) => {
     try {
-      const data = await api.post('/api/ai/analyze', profileData || {});
+      const data = await api.post('/ai/analyze', profileData || {});
       setAiProfile(data);
       localStorage.setItem('talap_ai_profile', JSON.stringify(data));
       return data;
@@ -91,7 +91,7 @@ export function AuthProvider({ children }) {
 
   const updateUser = async (userData) => {
     try {
-      const data = await api.put('/api/me', userData);
+      const data = await api.put('/me', userData);
       setUser(data);
       localStorage.setItem('talap_user', JSON.stringify(data));
       // Trigger AI re-analysis after profile update

@@ -108,7 +108,7 @@ export default function Catalog() {
     const query = new URLSearchParams(window.location.search).get('q');
     if (query) setSearch(query);
 
-    api.get('/api/professions')
+    api.get('/professions')
       .then(d => { 
         setProfessions(d); 
         setLoading(false); 

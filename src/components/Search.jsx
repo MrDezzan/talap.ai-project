@@ -39,7 +39,7 @@ export default function Search({ placeholder: propsPlaceholder, value: propsValu
     const timer = setTimeout(async () => {
       setLoading(true);
       try {
-        const data = await api.get(`/api/search?q=${encodeURIComponent(query)}`);
+        const data = await api.get(`/search?q=${encodeURIComponent(query)}`);
         setResults(data);
         setShowResults(true);
       } catch (err) {

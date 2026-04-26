@@ -13,7 +13,7 @@ export function ChatProvider({ children }) {
 
   const fetchThreads = async () => {
     try {
-      const data = await api.get('/api/chats');
+      const data = await api.get('/chats');
       setThreads(data || []);
     } catch (err) {
       console.error('Failed to fetch threads:', err);
@@ -23,7 +23,7 @@ export function ChatProvider({ children }) {
   const fetchMessages = async (threadId) => {
     if (messages[threadId]) return; // Already loaded
     try {
-      const data = await api.get(`/api/chats/${threadId}/messages`);
+      const data = await api.get(`/chats/${threadId}/messages`);
       setMessages(prev => ({ ...prev, [threadId]: (data || []).map(m => ({
         ai: m.role === 'assistant',
         text: m.content,
