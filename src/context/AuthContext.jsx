@@ -102,6 +102,12 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const loginWithToken = async (token) => {
+    localStorage.setItem('token', token);
+    await fetchMe();
+    await fetchAIProfile();
+  };
+
   const logout = () => {
     setUser(null);
     setAiProfile(null);
@@ -111,7 +117,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, analyzeProfile, updateUser, logout, loading, aiProfile }}>
+    <AuthContext.Provider value={{ user, login, register, analyzeProfile, updateUser, logout, loading, aiProfile, loginWithToken }}>
       {children}
     </AuthContext.Provider>
   );

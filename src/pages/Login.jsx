@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -43,7 +43,7 @@ function Field({ label, type = 'text', value, onChange, placeholder, error, auto
 }
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, loginWithToken } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -77,6 +77,29 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (token) {
+      localStorage.setItem('token', token);
+      // Fetch user data and sync context
+      const sync = async () => {
+        try {
+          await loginWithToken(token);
+          navigate('/dashboard');
+        } catch (e) {
+          console.error('Sync failed', e);
+        }
+      };
+      sync();
+    }
+  }, []);
+
+  const handleGoogleLogin = () => {
+    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+    window.location.href = `${apiBase}/api/auth/google/login`;
   };
 
   return (
@@ -125,11 +148,14 @@ export default function Login() {
           <div style={{ flex: 1, height: 1, background: C.hairline }} />
         </div>
 
-        <button style={{
-          width: '100%', padding: '11px 16px', borderRadius: 8, border: `1px solid ${C.hairline}`,
-          background: C.paper, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-          fontFamily: C.font, fontSize: 15, fontWeight: 600, color: C.ink900, cursor: 'pointer',
-        }}>
+        <button 
+          onClick={handleGoogleLogin}
+          style={{
+            width: '100%', padding: '11px 16px', borderRadius: 8, border: `1px solid ${C.hairline}`,
+            background: C.paper, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+            fontFamily: C.font, fontSize: 15, fontWeight: 600, color: C.ink900, cursor: 'pointer',
+          }}
+        >
           <svg width="18" height="18" viewBox="0 0 18 18">
             <path d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.06-.66-.15-1.17z" fill="#4285F4"/>
             <path d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2.01c-.72.48-1.63.77-2.7.77-2.08 0-3.84-1.4-4.47-3.29H1.83v2.07A8 8 0 0 0 8.98 17z" fill="#34A853"/>

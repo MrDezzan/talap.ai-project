@@ -49,6 +49,8 @@ func main() {
 	{
 		api.POST("/register", handlers.Register(db))
 		api.POST("/login", handlers.Login(db))
+		api.GET("/auth/google/login", handlers.GoogleLogin)
+		api.GET("/auth/google/callback", handlers.GoogleCallback(db))
 
 		api.GET("/grants", handlers.GetGrants(db))
 		api.GET("/professions", handlers.GetProfessions(db))
@@ -68,6 +70,15 @@ func main() {
 			auth.GET("/chats/:id/messages", handlers.GetChatMessages(db))
 		}
 	}
+
+	// Serve Static Files for Production
+	r.Static("/assets", "./dist/assets")
+	r.StaticFile("/logo.svg", "./dist/logo.svg")
+	r.NoRoute(func(c *gin.Context) {
+		if !strings.HasPrefix(c.Request.URL.Path, "/api") {
+			c.File("./dist/index.html")
+		}
+	})
 
 	port := os.Getenv("PORT")
 	if port == "" {

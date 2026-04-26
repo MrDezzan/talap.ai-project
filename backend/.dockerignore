@@ -1,0 +1,8 @@
+node_modules
+.git
+.env
+*.log
+.DS_Store
+talkd-backend
+talkd-server
+scratch
