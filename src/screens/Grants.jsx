@@ -6,8 +6,8 @@ import Card from '../components/Card';
 import Chip from '../components/Chip';
 import Button from '../components/Button';
 import Progress from '../components/Progress';
-import Mesh from '../components/Mesh';
 import { api } from '../lib/api';
+import { useLanguage } from '../context/LanguageContext';
 
 const C = {
   ink900: '#0A1230', ink700: '#2A3457', ink500: '#5A6485', ink300: '#9AA3BF',
@@ -19,9 +19,7 @@ const C = {
   mono: '"Geist Mono", monospace',
 };
 
-const FILTERS = ['Все', 'Бакалавриат', 'Магистратура', 'IT', 'Бизнес', 'За рубежом', 'Казахстан'];
-
-function GrantDetailModal({ grant, onClose }) {
+function GrantDetailModal({ grant, onClose, t, lang }) {
   if (!grant) return null;
   const tags = grant.tags || ['Грант'];
   return (
@@ -44,13 +42,12 @@ function GrantDetailModal({ grant, onClose }) {
         <div style={{ padding: 32, borderBottom: `1px solid ${C.hairline}`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
-              {tags.map(t => <Chip key={t}>{t}</Chip>)}
-              {grant.urgent && <Chip tone="warn" dot>Срочно</Chip>}
+              {tags.map(tag => <Chip key={tag}>{tag}</Chip>)}
             </div>
             <h2 style={{ fontFamily: C.font, fontSize: 24, fontWeight: 800, letterSpacing: '-0.02em', color: C.ink900, margin: '0 0 4px' }}>
               {grant.name}
             </h2>
-            <div style={{ fontFamily: C.font, fontSize: 14, color: C.ink500 }}>{grant.subtitle} · {grant.country || 'Казахстан'}</div>
+            <div style={{ fontFamily: C.font, fontSize: 14, color: C.ink500 }}>{grant.subtitle} · {grant.country}</div>
           </div>
           <button onClick={onClose} style={{ width: 36, height: 36, borderRadius: 8, background: C.mist, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <Icon name="plus" size={18} color={C.ink500} style={{ transform: 'rotate(45deg)' }} />
@@ -60,9 +57,9 @@ function GrantDetailModal({ grant, onClose }) {
         <div style={{ padding: 32 }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 28 }}>
             {[
-              { label: 'Сумма', value: grant.amount },
-              { label: 'До дедлайна', value: `${grant.deadline} дн.`, tone: grant.urgent ? 'warn' : null },
-              { label: 'Совпадение', value: `${grant.match}%`, tone: 'success' },
+              { label: t('grants_amount'), value: grant.amount },
+              { label: t('grants_deadline'), value: `${grant.deadline_days} ${t('days') || 'дн.'}`, tone: grant.tone === 'warn' ? 'warn' : null },
+              { label: 'Match', value: `${grant.match_percentage}%`, tone: 'success' },
             ].map((s, i) => (
               <div key={i} style={{ background: C.mist, borderRadius: 10, padding: 14 }}>
                 <div style={{ fontFamily: C.font, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', color: C.ink500 }}>{s.label}</div>
@@ -74,13 +71,13 @@ function GrantDetailModal({ grant, onClose }) {
           </div>
 
           <div style={{ marginBottom: 24 }}>
-            <div style={{ fontFamily: C.font, fontSize: 16, fontWeight: 700, color: C.ink900, marginBottom: 8 }}>О гранте</div>
-            <p style={{ fontFamily: C.font, fontSize: 14, lineHeight: '22px', color: C.ink700, margin: 0 }}>{grant.description || grant.desc}</p>
+            <div style={{ fontFamily: C.font, fontSize: 16, fontWeight: 700, color: C.ink900, marginBottom: 8 }}>{t('grants_about')}</div>
+            <p style={{ fontFamily: C.font, fontSize: 14, lineHeight: '22px', color: C.ink700, margin: 0 }}>{grant.description}</p>
           </div>
 
           <div style={{ marginBottom: 24 }}>
-            <div style={{ fontFamily: C.font, fontSize: 16, fontWeight: 700, color: C.ink900, marginBottom: 12 }}>Требования</div>
-            {(grant.req || grant.tags || []).map((r, i) => (
+            <div style={{ fontFamily: C.font, fontSize: 16, fontWeight: 700, color: C.ink900, marginBottom: 12 }}>{t('grants_requirements')}</div>
+            {(grant.tags || []).map((r, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderTop: i ? `1px solid ${C.hairline}` : 'none' }}>
                 <div style={{ width: 20, height: 20, borderRadius: 9999, background: C.blue100, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <Icon name="check" size={10} color={C.blue} strokeWidth={2.5} />
@@ -90,21 +87,23 @@ function GrantDetailModal({ grant, onClose }) {
             ))}
           </div>
 
-          <Mesh intensity={0.5} style={{ borderRadius: 12, padding: 16, marginBottom: 24 }}>
+          <div style={{ borderRadius: 12, padding: 16, marginBottom: 24, background: C.mist }}>
             <div style={{ display: 'flex', gap: 10 }}>
               <div style={{ width: 28, height: 28, borderRadius: 9999, background: 'white', boxShadow: '0 0 0 3px rgba(20,72,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <Icon name="sparkles" size={14} color={C.blue} strokeWidth={2} />
               </div>
               <div>
-                <div style={{ fontFamily: C.font, fontSize: 13, fontWeight: 700, color: C.ink900 }}>Talap советует</div>
+                <div style={{ fontFamily: C.font, fontSize: 13, fontWeight: 700, color: C.ink900 }}>{t('grants_ai_tip')}</div>
                 <div style={{ fontFamily: C.font, fontSize: 13, lineHeight: '20px', color: C.ink700, marginTop: 2 }}>
-                  Начни с IELTS — без него заявку не примут. Я подобрал 3 курса в твоём городе.
+                  {lang === 'en' ? 'Start with IELTS - without it, the application will not be accepted. I picked 3 courses in your city.' :
+                   lang === 'kz' ? 'IELTS-тан бастаңыз - онсыз өтінім қабылданбайды. Мен сіздің қалаңыздағы 3 курсты таңдадым.' :
+                   'Начни с IELTS — без него заявку не примут. Я подобрал 3 курса в твоём городе.'}
                 </div>
               </div>
             </div>
-          </Mesh>
+          </div>
 
-          <Button variant="primary" size="lg" fullWidth icon="arrowRight">Подать заявку</Button>
+          <Button variant="primary" size="lg" fullWidth icon="arrowRight">{t('grants_apply')}</Button>
         </div>
       </div>
     </div>
@@ -113,12 +112,23 @@ function GrantDetailModal({ grant, onClose }) {
 
 export default function Grants() {
   const navigate = useNavigate();
+  const { t, lang } = useLanguage();
   const [grants, setGrants] = useState([]);
   const [portfolio, setPortfolio] = useState({});
   const [loading, setLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState('Все');
+  const [activeFilter, setActiveFilter] = useState('all');
   const [selectedGrant, setSelectedGrant] = useState(null);
   const [search, setSearch] = useState('');
+
+  const FILTERS = [
+    { key: 'all', label: lang === 'en' ? 'All' : lang === 'kz' ? 'Барлығы' : 'Все' },
+    { key: 'Бакалавриат', label: lang === 'en' ? 'Bachelor' : lang === 'kz' ? 'Бакалавриат' : 'Бакалавриат' },
+    { key: 'Магистратура', label: lang === 'en' ? 'Master' : lang === 'kz' ? 'Магистратура' : 'Магистратура' },
+    { key: 'IT', label: 'IT' },
+    { key: 'Бизнес', label: lang === 'en' ? 'Business' : lang === 'kz' ? 'Бизнес' : 'Бизнес' },
+    { key: 'За рубежом', label: lang === 'en' ? 'Abroad' : lang === 'kz' ? 'Шетелде' : 'За рубежом' },
+    { key: 'Казахстан', label: lang === 'en' ? 'Kazakhstan' : lang === 'kz' ? 'Қазақстан' : 'Казахстан' },
+  ];
 
   useEffect(() => {
     Promise.all([
@@ -136,7 +146,7 @@ export default function Grants() {
   if (loading) return null;
 
   const filtered = grants.filter(g => {
-    const matchFilter = activeFilter === 'Все' || (g.tags && g.tags.includes(activeFilter));
+    const matchFilter = activeFilter === 'all' || (g.tags && g.tags.includes(activeFilter));
     const matchSearch = !search || g.name.toLowerCase().includes(search.toLowerCase()) || (g.subtitle && g.subtitle.toLowerCase().includes(search.toLowerCase()));
     return matchFilter && matchSearch;
   });
@@ -144,8 +154,8 @@ export default function Grants() {
   return (
     <div style={{ flex: 1, overflow: 'auto', background: C.mist, display: 'flex', flexDirection: 'column' }}>
       <TopBar
-        title="Гранты и стипендии"
-        subtitle={`${grants.length} актуальных предложений`}
+        title={t('grants_title')}
+        subtitle={`${grants.length} ${t('grants_subtitle')}`}
         actions={
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: C.paper, border: `1px solid ${C.hairline}`, borderRadius: 8, padding: '0 14px', height: 36 }}>
@@ -153,11 +163,10 @@ export default function Grants() {
               <input
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                placeholder="Поиск грантов..."
+                placeholder={t('grants_search')}
                 style={{ border: 'none', outline: 'none', fontFamily: C.font, fontSize: 13, color: C.ink900, background: 'transparent', width: 200 }}
               />
             </div>
-            <Button variant="outline" icon="filter" size="sm">Фильтры</Button>
           </div>
         }
       />
@@ -166,59 +175,45 @@ export default function Grants() {
         
         <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
           {FILTERS.map(f => (
-            <Chip key={f} selected={activeFilter === f} onClick={() => setActiveFilter(f)}>{f}</Chip>
+            <Chip key={f.key} selected={activeFilter === f.key} onClick={() => setActiveFilter(f.key)}>{f.label}</Chip>
           ))}
           <div style={{ flex: 1 }} />
-          <Chip dot tone="ai" onClick={() => navigate('/chat')}>AI-подбор по профилю</Chip>
+          <Chip dot tone="ai" onClick={() => navigate('/chat')}>{t('grants_ai_match')}</Chip>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 24 }}>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {filtered.map(g => (
-              <Card key={g.id} onClick={() => setSelectedGrant(g)} style={{ cursor: 'pointer', transition: 'box-shadow 150ms' }}>
+              <Card key={g.id} onClick={() => setSelectedGrant(g)} style={{ cursor: 'pointer' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 16, alignItems: 'flex-start' }}>
                   <div>
                     <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
-                      {(g.tags || ['Грант']).map(t => <Chip key={t}>{t}</Chip>)}
-                      {g.tone === 'warn' && <Chip tone="warn" dot>Срочно</Chip>}
+                      {(g.tags || ['Грант']).map(tag => <Chip key={tag}>{tag}</Chip>)}
                     </div>
                     <div style={{ fontFamily: C.font, fontSize: 17, fontWeight: 700, letterSpacing: '-0.015em', color: C.ink900, marginBottom: 4 }}>{g.name}</div>
-                    <div style={{ fontFamily: C.font, fontSize: 13, color: C.ink500 }}>{g.subtitle} · {g.country || 'Казахстан'}</div>
-                    <div style={{ fontFamily: C.font, fontSize: 13, color: C.ink700, marginTop: 8, lineHeight: 1.5 }}>{g.description || ''}</div>
+                    <div style={{ fontFamily: C.font, fontSize: 13, color: C.ink500 }}>{g.subtitle} · {g.country}</div>
                   </div>
                   <div style={{ textAlign: 'right', flexShrink: 0 }}>
                     <div style={{ fontFamily: C.mono, fontSize: 13, fontWeight: 700, color: C.blue, marginBottom: 4 }}>{g.match_percentage}% match</div>
                     <div style={{ fontFamily: C.font, fontSize: 12, color: g.tone === 'warn' ? C.warn700 : C.ink500, marginBottom: 8 }}>
-                      {g.deadline_days} дн. до дедлайна
+                      {g.deadline_days} {t('grants_deadline')}
                     </div>
-                    <Button variant="outline" size="sm">Подробнее</Button>
                   </div>
-                </div>
-                <div style={{ marginTop: 12 }}>
-                  <Progress value={g.match_percentage} height={3} />
                 </div>
               </Card>
             ))}
-            {filtered.length === 0 && (
-              <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-                <Icon name="search" size={40} color={C.ink300} />
-                <div style={{ fontFamily: C.font, fontSize: 16, fontWeight: 600, color: C.ink500, marginTop: 12 }}>Ничего не найдено</div>
-                <div style={{ fontFamily: C.font, fontSize: 13, color: C.ink300, marginTop: 4 }}>Попробуй другой фильтр или поисковый запрос</div>
-              </div>
-            )}
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <Card>
               <div style={{ fontFamily: C.font, fontSize: 13, fontWeight: 700, color: C.ink900, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Icon name="target" size={16} color={C.blue} />
-                Твой match-профиль
+                {t('grants_match_profile')}
               </div>
               {[
-                { label: 'ЕНТ', value: portfolio.ent || 'Не указано', bar: portfolio.ent ? Math.min(100, (parseInt(portfolio.ent) / 140) * 100) : 0 },
-                { label: 'Английский', value: portfolio.english || 'Не указано', bar: portfolio.english ? 80 : 0 },
-                { label: 'Портфолио', value: `${(portfolio.achievements || []).length} достижения`, bar: Math.min(100, (portfolio.achievements || []).length * 20) },
+                { label: 'ЕНТ', value: portfolio.ent || '-', bar: portfolio.ent ? (parseInt(portfolio.ent)/140)*100 : 0 },
+                { label: 'English', value: portfolio.english || '-', bar: portfolio.english ? 80 : 0 },
               ].map((s, i) => (
                 <div key={i} style={{ marginBottom: 14 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
@@ -228,36 +223,12 @@ export default function Grants() {
                   <Progress value={s.bar} height={4} />
                 </div>
               ))}
-              <Button variant="secondary" size="sm" fullWidth style={{ marginTop: 4 }} onClick={() => navigate('/portfolio')}>Улучшить профиль</Button>
-            </Card>
-
-            <Mesh intensity={0.45} style={{ borderRadius: 12, padding: 18 }}>
-              <Chip dot tone="ai">Talap AI</Chip>
-              <div style={{ fontFamily: C.font, fontSize: 14, fontWeight: 600, color: C.ink900, marginTop: 10, lineHeight: 1.5 }}>
-                Хочешь — подберу дедлайны и составлю план подготовки к грантам на следующие 3 месяца?
-              </div>
-              <Button variant="ai" size="sm" icon="sparkles" style={{ marginTop: 12, width: '100%' }}>Составить план</Button>
-            </Mesh>
-
-            <Card>
-              <div style={{ fontFamily: C.font, fontSize: 13, fontWeight: 700, color: C.ink900, marginBottom: 12 }}>Ближайшие дедлайны</div>
-              {grants.filter(g => g.deadline_days <= 30).sort((a, b) => a.deadline_days - b.deadline_days).map((g, i) => (
-                <div key={g.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderTop: i ? `1px solid ${C.hairline}` : 'none' }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 6, background: g.tone === 'warn' ? C.warn100 : C.blue50, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <span style={{ fontFamily: C.mono, fontSize: 13, fontWeight: 700, color: g.tone === 'warn' ? C.warn700 : C.blue }}>{g.deadline_days}</span>
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: C.font, fontSize: 12, fontWeight: 600, color: C.ink900 }}>{g.name}</div>
-                    <div style={{ fontFamily: C.font, fontSize: 11, color: C.ink500 }}>дней осталось</div>
-                  </div>
-                </div>
-              ))}
             </Card>
           </div>
         </div>
       </div>
 
-      {selectedGrant && <GrantDetailModal grant={selectedGrant} onClose={() => setSelectedGrant(null)} />}
+      {selectedGrant && <GrantDetailModal grant={selectedGrant} t={t} lang={lang} onClose={() => setSelectedGrant(null)} />}
     </div>
   );
 }

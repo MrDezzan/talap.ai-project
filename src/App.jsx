@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { AuthProvider } from './context/AuthContext';
+import { ChatProvider } from './context/ChatContext';
+import { LanguageProvider } from './context/LanguageContext';
 
 import AppLayout from './layouts/AppLayout';
 import AuthLayout from './layouts/AuthLayout';
@@ -27,32 +29,36 @@ function ScrollToTop() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <ScrollToTop />
-        <Routes>
-          
-          <Route path="/" element={<Landing />} />
+    <LanguageProvider>
+      <AuthProvider>
+        <ChatProvider>
+          <BrowserRouter>
+          <ScrollToTop />
+          <Routes>
+            
+            <Route path="/" element={<Landing />} />
 
-          <Route element={<AuthLayout />}>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-          </Route>
+            <Route element={<AuthLayout />}>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+            </Route>
 
-          <Route element={<AppLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/professions" element={<Catalog />} />
-            <Route path="/grants" element={<Grants />} />
-            <Route path="/roadmap" element={<Roadmap />} />
-            <Route path="/portfolio" element={<Portfolio />} />
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/settings" element={<Profile />} />
-          </Route>
+            <Route element={<AppLayout />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/professions" element={<Catalog />} />
+              <Route path="/grants" element={<Grants />} />
+              <Route path="/roadmap" element={<Roadmap />} />
+              <Route path="/portfolio" element={<Portfolio />} />
+              <Route path="/chat" element={<Chat />} />
+              <Route path="/settings" element={<Profile />} />
+            </Route>
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+        </ChatProvider>
+      </AuthProvider>
+    </LanguageProvider>
   );
 }

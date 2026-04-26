@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import Button from '../components/Button';
 import Icon from '../components/Icon';
 import Progress from '../components/Progress';
@@ -13,13 +14,6 @@ const C = {
   success700: '#047857', success100: '#ECFAF3',
   font: 'var(--font-sans)',
 };
-
-const STAGES = [
-  { icon: 'user',      text: 'Изучаю твой профиль...',        sub: 'Анализирую интересы и цели' },
-  { icon: 'compass',   text: 'Подбираю профессии...',          sub: 'Считаю совпадение с твоими данными' },
-  { icon: 'award',     text: 'Анализирую гранты...',           sub: 'Ищу подходящие программы в Казахстане' },
-  { icon: 'target',    text: 'Строю карьерный маршрут...',     sub: 'Формирую пошаговый план для тебя' },
-];
 
 function Field({ label, type = 'text', value, onChange, placeholder, error, hint, autoFocus }) {
   const [focused, setFocused] = useState(false);
@@ -51,7 +45,7 @@ function Field({ label, type = 'text', value, onChange, placeholder, error, hint
   );
 }
 
-function SelectField({ label, value, onChange, options, error }) {
+function SelectField({ label, value, onChange, options, error, t }) {
   const [focused, setFocused] = useState(false);
   return (
     <div style={{ marginBottom: 16 }}>
@@ -73,7 +67,7 @@ function SelectField({ label, value, onChange, options, error }) {
           cursor: 'pointer', boxSizing: 'border-box',
         }}
       >
-        <option value="">Выбери...</option>
+        <option value="">{t('auth_select') || 'Выбери...'}</option>
         {options.map(o => <option key={o} value={o}>{o}</option>)}
       </select>
       {error && <div style={{ fontFamily: C.font, fontSize: 12, color: C.error700, marginTop: 4 }}>{error}</div>}
@@ -81,11 +75,14 @@ function SelectField({ label, value, onChange, options, error }) {
   );
 }
 
-const GRADES = ['9 класс', '10 класс', '11 класс', '1 курс', '2 курс', '3 курс', '4 курс'];
-const CITIES = ['Алматы', 'Астана', 'Шымкент', 'Атырау', 'Актобе', 'Павлодар', 'Другой город'];
-const INTERESTS = ['Математика', 'Информатика', 'Биология', 'Физика', 'Химия', 'История', 'Языки', 'Экономика', 'Дизайн', 'Спорт'];
+function AnalyzingScreen({ name, t, lang }) {
+  const STAGES = [
+    { icon: 'user',      text: lang === 'en' ? 'Studying your profile...' : lang === 'kz' ? 'Профильіңізді зерттеу...' : 'Изучаю твой профиль...',        sub: lang === 'en' ? 'Analyzing interests and goals' : lang === 'kz' ? 'Қызығушылықтар мен мақсаттарды талдау' : 'Анализирую интересы и цели' },
+    { icon: 'compass',   text: lang === 'en' ? 'Picking professions...' : lang === 'kz' ? 'Мамандықтар таңдау...' : 'Подбираю профессии...',          sub: lang === 'en' ? 'Calculating matches' : lang === 'kz' ? 'Сәйкестікті есептеу' : 'Считаю совпадение с твоими данными' },
+    { icon: 'award',     text: lang === 'en' ? 'Analyzing grants...' : lang === 'kz' ? 'Гранттарды талдау...' : 'Анализирую гранты...',           sub: lang === 'en' ? 'Searching for programs' : lang === 'kz' ? 'Бағдарламаларды іздеу' : 'Ищу подходящие программы в Казахстане' },
+    { icon: 'target',    text: lang === 'en' ? 'Building roadmap...' : lang === 'kz' ? 'Жол картасын құру...' : 'Строю карьерный маршрут...',     sub: lang === 'en' ? 'Generating step-by-step plan' : lang === 'kz' ? 'Қадамдық жоспар құру' : 'Формирую пошаговый план для тебя' },
+  ];
 
-function AnalyzingScreen({ name }) {
   const [stage, setStage] = useState(0);
   const [progress, setProgress] = useState(0);
   const [done, setDone] = useState(false);
@@ -153,15 +150,15 @@ function AnalyzingScreen({ name }) {
         </div>
 
         <div style={{ fontFamily: C.font, fontSize: 22, fontWeight: 700, color: C.ink900, marginBottom: 6 }}>
-          {done ? `Готово, ${name}!` : STAGES[stage].text}
+          {done ? (lang === 'en' ? `Ready, ${name}!` : lang === 'kz' ? `Дайын, ${name}!` : `Готово, ${name}!`) : STAGES[stage].text}
         </div>
         <div style={{ fontFamily: C.font, fontSize: 14, color: C.ink500, marginBottom: 32, minHeight: 20 }}>
-          {done ? 'Открываю твой персональный дашборд...' : STAGES[stage].sub}
+          {done ? (lang === 'en' ? 'Opening your personal dashboard...' : lang === 'kz' ? 'Жеке тақтаны ашуда...' : 'Открываю твой персональный дашборд...') : STAGES[stage].sub}
         </div>
 
         <div style={{ marginBottom: 24 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-            <span style={{ fontFamily: C.font, fontSize: 12, color: C.ink500 }}>Анализ профиля</span>
+            <span style={{ fontFamily: C.font, fontSize: 12, color: C.ink500 }}>{lang === 'en' ? 'Profile analysis' : lang === 'kz' ? 'Профиль талдау' : 'Анализ профиля'}</span>
             <span style={{ fontFamily: '"Geist Mono",monospace', fontSize: 12, fontWeight: 600, color: C.blue }}>{done ? 100 : progress}%</span>
           </div>
           <Progress value={done ? 100 : progress} height={6} />
@@ -209,6 +206,7 @@ function AnalyzingScreen({ name }) {
 
 export default function Register() {
   const { login, register, analyzeProfile } = useAuth();
+  const { t, lang } = useLanguage();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -234,20 +232,32 @@ export default function Register() {
 
   const validateStep0 = () => {
     const e = {};
-    if (!form.name.trim()) e.name = 'Введи имя';
-    if (!form.email) e.email = 'Введи email';
-    else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = 'Некорректный email';
-    if (!form.password) e.password = 'Придумай пароль';
-    else if (form.password.length < 6) e.password = 'Минимум 6 символов';
+    if (!form.name.trim()) e.name = t('auth_error_name') || 'Введи имя';
+    if (!form.email) e.email = t('auth_error_email') || 'Введи email';
+    else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = t('auth_error_email_invalid') || 'Некорректный email';
+    if (!form.password) e.password = t('auth_error_pass') || 'Придумай пароль';
+    else if (form.password.length < 6) e.password = t('auth_error_pass_short') || 'Минимум 6 символов';
     return e;
   };
 
   const validateStep1 = () => {
     const e = {};
-    if (!form.grade) e.grade = 'Выбери класс или курс';
-    if (!form.city) e.city = 'Выбери город';
+    if (!form.grade) e.grade = t('auth_error_grade') || 'Выбери класс или курс';
+    if (!form.city) e.city = t('auth_error_city') || 'Выбери город';
     return e;
   };
+
+  const GRADES = lang === 'en' ? ['9th Grade', '10th Grade', '11th Grade', '1st Year', '2nd Year', '3rd Year', '4th Year'] :
+                 lang === 'kz' ? ['9 сынып', '10 сынып', '11 сынып', '1 курс', '2 курс', '3 курс', '4 курс'] :
+                 ['9 класс', '10 класс', '11 класс', '1 курс', '2 курс', '3 курс', '4 курс'];
+                 
+  const CITIES = lang === 'en' ? ['Almaty', 'Astana', 'Shymkent', 'Atyrau', 'Aktobe', 'Pavlodar', 'Other'] :
+                 lang === 'kz' ? ['Алматы', 'Астана', 'Шымкент', 'Атырау', 'Ақтөбе', 'Павлодар', 'Басқа қала'] :
+                 ['Алматы', 'Астана', 'Шымкент', 'Атырау', 'Актобе', 'Павлодар', 'Другой город'];
+
+  const INTERESTS = lang === 'en' ? ['Math', 'CS', 'Biology', 'Physics', 'Chemistry', 'History', 'Languages', 'Economy', 'Design', 'Sport'] :
+                    lang === 'kz' ? ['Математика', 'Информатика', 'Биология', 'Физика', 'Химия', 'Тарих', 'Тілдер', 'Экономика', 'Дизайн', 'Спорт'] :
+                    ['Математика', 'Информатика', 'Биология', 'Физика', 'Химия', 'История', 'Языки', 'Экономика', 'Дизайн', 'Спорт'];
 
 
   const nextStep = async () => {
@@ -270,11 +280,9 @@ export default function Register() {
         const loginRes = await login(form.email, form.password);
         if (loginRes.error) throw new Error(loginRes.error);
 
-        // Move to animated loading screen immediately
         setAnalyzingName(form.name.split(' ')[0]);
         setStep(2);
 
-        // Fire AI analysis in the background — wait at least 7.5s for animation UX
         const [analysisResult] = await Promise.all([
           analyzeProfile({
             name: form.name,
@@ -303,7 +311,7 @@ export default function Register() {
         minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
         background: C.mist, padding: 24,
       }}>
-        <AnalyzingScreen name={analyzingName} />
+        <AnalyzingScreen name={analyzingName} t={t} lang={lang} />
       </div>
     );
   }
@@ -312,10 +320,10 @@ export default function Register() {
     <div style={{ width: '100%', maxWidth: 480 }}>
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
         <h1 style={{ fontFamily: C.font, fontSize: 28, fontWeight: 800, letterSpacing: '-0.025em', color: C.ink900, margin: '0 0 8px' }}>
-          Создай профиль
+          {t('auth_register_title')}
         </h1>
         <p style={{ fontFamily: C.font, fontSize: 15, color: C.ink500, margin: 0 }}>
-          Шаг {step + 1} из 2 — займёт 2 минуты
+          {lang === 'en' ? `Step ${step + 1} of 2 — takes 2 mins` : lang === 'kz' ? `${step + 1}-ші қадам — 2 минут алады` : `Шаг ${step + 1} из 2 — займёт 2 минуты`}
         </p>
       </div>
 
@@ -332,19 +340,19 @@ export default function Register() {
       <div style={{ background: C.paper, borderRadius: 16, padding: 32, border: `1px solid ${C.hairline}`, boxShadow: '0 8px 32px rgba(10,18,48,0.06)' }}>
         {step === 0 && (
           <>
-            <Field label="Как тебя зовут?" value={form.name} onChange={set('name')} placeholder="Айдана Серикова" error={errors.name} autoFocus />
-            <Field label="Email" type="email" value={form.email} onChange={set('email')} placeholder="твой@email.kz" error={errors.email} />
-            <Field label="Пароль" type="password" value={form.password} onChange={set('password')} placeholder="Минимум 6 символов" error={errors.password} hint="Используй буквы, цифры и символы" />
+            <Field label={t('auth_name_label')} value={form.name} onChange={set('name')} placeholder="Айдана Серикова" error={errors.name} autoFocus />
+            <Field label={t('auth_email_label')} type="email" value={form.email} onChange={set('email')} placeholder="твой@email.kz" error={errors.email} />
+            <Field label={t('auth_pass_label')} type="password" value={form.password} onChange={set('password')} placeholder="••••••••" error={errors.password} hint={lang === 'en' ? 'Use letters and digits' : lang === 'kz' ? 'Әріптер мен сандарды қолданыңыз' : 'Используй буквы и цифры'} />
           </>
         )}
 
         {step === 1 && (
           <>
-            <SelectField label="Класс / курс" value={form.grade} onChange={set('grade')} options={GRADES} error={errors.grade} />
-            <SelectField label="Город" value={form.city} onChange={set('city')} options={CITIES} error={errors.city} />
+            <SelectField label={t('settings_grade')} value={form.grade} onChange={set('grade')} options={GRADES} error={errors.grade} t={t} />
+            <SelectField label={t('settings_city')} value={form.city} onChange={set('city')} options={CITIES} error={errors.city} t={t} />
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, marginBottom: 10 }}>
-                Интересы <span style={{ color: C.ink300, fontWeight: 400 }}>(по желанию)</span>
+                {lang === 'en' ? 'Interests' : lang === 'kz' ? 'Қызығушылықтар' : 'Интересы'} <span style={{ color: C.ink300, fontWeight: 400 }}>({lang === 'en' ? 'optional' : lang === 'kz' ? 'міндетті емес' : 'по желанию'})</span>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {INTERESTS.map(i => {
@@ -371,14 +379,14 @@ export default function Register() {
         )}
 
         <Button variant="primary" size="lg" fullWidth onClick={nextStep} style={{ marginTop: 8 }}>
-          {loading ? 'Загрузка...' : step === 1 ? 'Создать профиль' : 'Продолжить'}
+          {loading ? (lang === 'en' ? 'Loading...' : lang === 'kz' ? 'Жүктелуде...' : 'Загрузка...') : step === 1 ? t('auth_register_btn') : (lang === 'en' ? 'Continue' : lang === 'kz' ? 'Жалғастыру' : 'Продолжить')}
         </Button>
 
         {step === 0 && (
           <>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 0' }}>
               <div style={{ flex: 1, height: 1, background: C.hairline }} />
-              <span style={{ fontFamily: C.font, fontSize: 12, color: C.ink300 }}>или</span>
+              <span style={{ fontFamily: C.font, fontSize: 12, color: C.ink300 }}>{t('auth_or')}</span>
               <div style={{ flex: 1, height: 1, background: C.hairline }} />
             </div>
             <button style={{
@@ -392,15 +400,15 @@ export default function Register() {
                 <path d="M4.51 10.53A4.8 4.8 0 0 1 4.26 9c0-.53.09-1.04.25-1.53V5.4H1.83A8 8 0 0 0 .98 9c0 1.3.31 2.52.85 3.6l2.68-2.07z" fill="#FBBC05"/>
                 <path d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 .98 9l2.68 2.07C4.14 5.59 6.32 4.18 8.98 4.18z" fill="#EA4335"/>
               </svg>
-              Зарегистрироваться через Google
+              {lang === 'en' ? 'Register with Google' : lang === 'kz' ? 'Google арқылы тіркелу' : 'Зарегистрироваться через Google'}
             </button>
           </>
         )}
       </div>
 
       <p style={{ textAlign: 'center', fontFamily: C.font, fontSize: 14, color: C.ink500, marginTop: 24 }}>
-        Уже есть аккаунт?{' '}
-        <Link to="/login" style={{ color: C.blue, fontWeight: 600, textDecoration: 'none' }}>Войти</Link>
+        {t('auth_have_account')}{' '}
+        <Link to="/login" style={{ color: C.blue, fontWeight: 600, textDecoration: 'none' }}>{t('auth_login_link')}</Link>
       </p>
     </div>
   );

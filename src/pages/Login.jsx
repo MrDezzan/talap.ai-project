@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import Button from '../components/Button';
 import Icon from '../components/Icon';
 
@@ -43,6 +44,7 @@ function Field({ label, type = 'text', value, onChange, placeholder, error, auto
 
 export default function Login() {
   const { login } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -81,17 +83,17 @@ export default function Login() {
     <div style={{ width: '100%', maxWidth: 440 }}>
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
         <h1 style={{ fontFamily: C.font, fontSize: 28, fontWeight: 800, letterSpacing: '-0.025em', color: C.ink900, margin: '0 0 8px' }}>
-          Добро пожаловать
+          {t('auth_welcome')}
         </h1>
         <p style={{ fontFamily: C.font, fontSize: 15, color: C.ink500, margin: 0 }}>
-          Войди в свой аккаунт Talap.ai
+          {t('auth_login_subtitle')}
         </p>
       </div>
 
       <div style={{ background: C.paper, borderRadius: 16, padding: 32, border: `1px solid ${C.hairline}`, boxShadow: '0 8px 32px rgba(10,18,48,0.06)' }}>
         <form onSubmit={handleSubmit} noValidate>
           <Field
-            label="Email"
+            label={t('auth_email_label')}
             type="email"
             value={email}
             onChange={e => { setEmail(e.target.value); setErrors(p => ({ ...p, email: '' })); }}
@@ -100,7 +102,7 @@ export default function Login() {
             autoFocus
           />
           <Field
-            label="Пароль"
+            label={t('auth_pass_label')}
             type="password"
             value={password}
             onChange={e => { setPassword(e.target.value); setErrors(p => ({ ...p, password: '' })); }}
@@ -109,17 +111,17 @@ export default function Login() {
           />
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20, marginTop: -8 }}>
             <Link to="/forgot-password" style={{ fontFamily: C.font, fontSize: 13, color: C.blue, fontWeight: 600, textDecoration: 'none' }}>
-              Забыл пароль?
+              {t('auth_forgot_pass')}
             </Link>
           </div>
           <Button variant="primary" size="lg" fullWidth onClick={handleSubmit} style={{ opacity: loading ? 0.7 : 1 }}>
-            {loading ? 'Входим...' : 'Войти'}
+            {loading ? t('auth_logging_in') : t('auth_login_btn')}
           </Button>
         </form>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '24px 0' }}>
           <div style={{ flex: 1, height: 1, background: C.hairline }} />
-          <span style={{ fontFamily: C.font, fontSize: 12, color: C.ink300 }}>или</span>
+          <span style={{ fontFamily: C.font, fontSize: 12, color: C.ink300 }}>{t('auth_or')}</span>
           <div style={{ flex: 1, height: 1, background: C.hairline }} />
         </div>
 
@@ -134,14 +136,14 @@ export default function Login() {
             <path d="M4.51 10.53A4.8 4.8 0 0 1 4.26 9c0-.53.09-1.04.25-1.53V5.4H1.83A8 8 0 0 0 .98 9c0 1.3.31 2.52.85 3.6l2.68-2.07z" fill="#FBBC05"/>
             <path d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 .98 9l2.68 2.07C4.14 5.59 6.32 4.18 8.98 4.18z" fill="#EA4335"/>
           </svg>
-          Войти через Google
+          {t('auth_google')}
         </button>
       </div>
 
       <p style={{ textAlign: 'center', fontFamily: C.font, fontSize: 14, color: C.ink500, marginTop: 24 }}>
-        Нет аккаунта?{' '}
+        {t('auth_no_account')}{' '}
         <Link to="/register" style={{ color: C.blue, fontWeight: 600, textDecoration: 'none' }}>
-          Зарегистрироваться
+          {t('auth_register_link')}
         </Link>
       </p>
     </div>

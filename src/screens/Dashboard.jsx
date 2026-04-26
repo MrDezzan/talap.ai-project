@@ -28,7 +28,6 @@ export default function Dashboard() {
 
   const firstName = user?.name?.split(' ')[0] || 'Студент';
 
-  // Build stats from AI profile or fallback defaults
   const stats = aiProfile
     ? [
         {
@@ -86,7 +85,6 @@ export default function Dashboard() {
       <div style={{ padding: 32, display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24, minHeight: 0 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
-          {/* Hero banner — AI summary or top grant */}
           <Mesh intensity={0.85} style={{ borderRadius: 16, padding: 28, minHeight: 200 }}>
             <Chip dot tone="ai" style={{ background: 'rgba(255,255,255,0.2)', color: 'white', backdropFilter: 'blur(10px)' }}>
               Talap советует
@@ -125,7 +123,6 @@ export default function Dashboard() {
             </div>
           </Mesh>
 
-          {/* Stats */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
             {stats.map((s, i) => (
               <Card key={i}>
@@ -143,7 +140,6 @@ export default function Dashboard() {
             ))}
           </div>
 
-          {/* Grants table */}
           {aiProfile?.grants?.length > 0 && (
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 14 }}>
@@ -189,7 +185,6 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* Professions */}
           {aiProfile?.professions?.length > 0 && (
             <div>
               <div style={{ fontFamily: C.font, fontSize: 16, fontWeight: 700, letterSpacing: '-0.015em', color: C.ink900, marginBottom: 14 }}>
@@ -207,8 +202,8 @@ export default function Dashboard() {
                     <div style={{ fontFamily: C.font, fontSize: 15, fontWeight: 700, color: C.ink900, marginBottom: 4 }}>{p.name}</div>
                     <div style={{ fontFamily: C.font, fontSize: 12, color: C.ink500, lineHeight: 1.4, marginBottom: 10 }}>{p.description}</div>
                     <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                      {(p.tags || []).slice(0, 2).map(t => (
-                        <span key={t} style={{ fontFamily: C.font, fontSize: 11, fontWeight: 600, color: C.blue, background: C.blue50, padding: '2px 8px', borderRadius: 4 }}>{t}</span>
+                      {(p.tags || []).slice(0, 2).map(tag => (
+                        <span key={tag} style={{ fontFamily: C.font, fontSize: 11, fontWeight: 600, color: C.blue, background: C.blue50, padding: '2px 8px', borderRadius: 4 }}>{tag}</span>
                       ))}
                     </div>
                     <Progress value={p.match_percentage} height={3} style={{ marginTop: 12 }} />
@@ -219,10 +214,8 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Sidebar */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-          {/* Roadmap preview */}
           {aiProfile?.roadmap?.length > 0 ? (
             <Card>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
@@ -263,7 +256,6 @@ export default function Dashboard() {
             </Card>
           )}
 
-          {/* Deadlines */}
           {aiProfile?.grants?.length > 0 && (
             <Card>
               <div style={{ fontFamily: C.font, fontSize: 13, fontWeight: 700, color: C.ink900, marginBottom: 12 }}>

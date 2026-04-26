@@ -1,22 +1,27 @@
 import { NavLink, Link } from 'react-router-dom';
 import Icon from './Icon';
 import Avatar from './Avatar';
-import Mesh from './Mesh';
 import Button from './Button';
 import logomark from '../assets/logomark.svg';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const NAV_ITEMS = [
-  { to: '/dashboard',   label: 'Лента',          icon: 'home' },
-  { to: '/professions', label: 'Профессии',       icon: 'compass' },
-  { to: '/grants',      label: 'Гранты',          icon: 'award' },
-  { to: '/roadmap',     label: 'Карьерный путь',  icon: 'target' },
-  { to: '/portfolio',   label: 'Портфолио',       icon: 'trophy' },
-  { to: '/chat',        label: 'AI-чат',          icon: 'sparkles' },
+// ...
 ];
 
 export default function Sidebar() {
   const { user } = useAuth();
+  const { lang, setLang, t } = useLanguage();
+  
+  const navItems = [
+    { to: '/dashboard',   label: t('nav_home'),          icon: 'home' },
+    { to: '/professions', label: t('nav_professions'),   icon: 'compass' },
+    { to: '/grants',      label: t('nav_grants'),        icon: 'award' },
+    { to: '/roadmap',     label: t('nav_roadmap'),       icon: 'target' },
+    { to: '/portfolio',   label: t('nav_portfolio'),     icon: 'trophy' },
+    { to: '/chat',        label: t('nav_chat'),          icon: 'sparkles' },
+  ];
   return (
     <aside style={{
       width: 240,
@@ -35,7 +40,7 @@ export default function Sidebar() {
       </Link>
 
       <nav style={{ padding: '0 8px', display: 'flex', flexDirection: 'column', gap: 2 }}>
-        {NAV_ITEMS.map(item => (
+        {navItems.map(item => (
           <NavLink
             key={item.to}
             to={item.to}
@@ -69,23 +74,47 @@ export default function Sidebar() {
 
       <div style={{ flex: 1 }} />
 
+      <div style={{ padding: '8px 16px', display: 'flex', gap: 4, marginBottom: 8 }}>
+        {['ru', 'en', 'kz'].map(l => (
+          <button
+            key={l}
+            onClick={() => setLang(l)}
+            style={{
+              flex: 1,
+              padding: '6px 0',
+              borderRadius: 6,
+              border: '1px solid ' + (lang === l ? '#1448FF' : '#E4E8F1'),
+              background: lang === l ? '#F2F5FF' : 'white',
+              color: lang === l ? '#1448FF' : '#5A6485',
+              fontSize: 11,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              transition: 'all 150ms'
+            }}
+          >
+            {l}
+          </button>
+        ))}
+      </div>
+
       <div style={{ padding: '8px 8px 12px' }}>
-        <Mesh intensity={0.5} style={{ borderRadius: 12, padding: 14 }}>
+        <div style={{ borderRadius: 12, padding: 14, background: '#1448FF10' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <Icon name="sparkles" size={14} color="#1448FF" strokeWidth={2} />
-            <div style={{ fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 700, color: '#0A1230' }}>Talap Pro</div>
+            <div style={{ fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 700, color: '#0A1230' }}>{t('pro_title')}</div>
           </div>
           <div style={{ fontFamily: 'var(--font-sans)', fontSize: 12, color: '#2A3457', marginTop: 4, lineHeight: '16px' }}>
-            Открой все AI-возможности
+            {t('pro_desc')}
           </div>
-          <Button variant="primary" size="sm" style={{ marginTop: 10, width: '100%' }}>Открыть</Button>
-        </Mesh>
+          <Button variant="primary" size="sm" style={{ marginTop: 10, width: '100%' }}>{t('pro_btn')}</Button>
+        </div>
       </div>
 
       <Link to="/settings" style={{ padding: '12px 16px', borderTop: '1px solid #E4E8F1', display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
         <Avatar name={user?.name || 'U'} size={32} />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 600, color: '#0A1230', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name || 'Профиль'}</div>
+          <div style={{ fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 600, color: '#0A1230', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name || t('nav_settings')}</div>
           <div style={{ fontFamily: 'var(--font-sans)', fontSize: 11, color: '#5A6485', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email || ''}</div>
         </div>
         <Icon name="settings" size={16} color="#5A6485" />

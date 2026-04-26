@@ -56,9 +56,9 @@ function ProfileModal({ onClose, onSave, initialData }) {
         <div style={{ padding: 28 }}>
           <div style={{ marginBottom: 20 }}>
             <label style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, display: 'block', marginBottom: 6 }}>О себе</label>
-            <textarea 
-              value={bio} 
-              onChange={e => setBio(e.target.value)} 
+            <textarea
+              value={bio}
+              onChange={e => setBio(e.target.value)}
               placeholder="Расскажи о своих интересах..."
               style={{ width: '100%', padding: 12, borderRadius: 8, border: `1px solid ${C.hairline}`, fontFamily: C.font, fontSize: 14, minHeight: 80, outline: 'none' }}
             />
@@ -81,10 +81,10 @@ function ProfileModal({ onClose, onSave, initialData }) {
               ))}
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <input 
-                value={newSkill} 
+              <input
+                value={newSkill}
                 onChange={e => setNewSkill(e.target.value)}
-                onKeyPress={e => e.key === 'Enter' && addSkill()}
+                onKeyDown={e => e.key === 'Enter' && addSkill()}
                 placeholder="Добавить навык..."
                 style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.hairline}`, fontFamily: C.font, fontSize: 14, outline: 'none' }}
               />
@@ -118,14 +118,14 @@ function AchievementModal({ onClose, onSave, onDelete, initialData }) {
 
   const handleSave = () => {
     if (!title || !org) return;
-    onSave({ 
-      id: initialData?.id || Date.now(), 
-      title, 
-      org, 
-      year, 
-      rank, 
-      icon: initialData?.icon || 'bookOpen', 
-      tone: initialData?.tone || 'blue' 
+    onSave({
+      id: initialData?.id || Date.now(),
+      title,
+      org,
+      year,
+      rank,
+      icon: initialData?.icon || 'bookOpen',
+      tone: initialData?.tone || 'blue',
     });
     onClose();
   };
@@ -183,7 +183,7 @@ function AchievementModal({ onClose, onSave, onDelete, initialData }) {
 
 export default function Portfolio() {
   const { user } = useAuth();
-  const [portfolio, setPortfolio] = useState({ bio: '', skills: [], achievements: [] });
+  const [portfolio, setPortfolio] = useState({ bio: '', ent: '', english: '', skills: [], achievements: [] });
   const [loading, setLoading] = useState(true);
   const [editingItem, setEditingItem] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
@@ -191,39 +191,32 @@ export default function Portfolio() {
 
   useEffect(() => {
     api.get('/api/portfolio')
-      .then(d => { setPortfolio(d); setLoading(false); })
+      .then(d => { setPortfolio({ bio: '', ent: '', english: '', skills: [], achievements: [], ...d }); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
 
   const savePortfolio = (updated) => {
     setPortfolio(updated);
     api.put('/api/portfolio', updated).then(() => {
-      // Background regeneration of the roadmap
       api.post('/api/ai/analyze', {}).catch(console.error);
-    }).catch(() => {});
+    }).catch(console.error);
   };
 
   const saveAchievement = (it) => {
     const safeAchievements = Array.isArray(portfolio.achievements) ? portfolio.achievements : [];
     const existingIdx = safeAchievements.findIndex(a => a.id === it.id);
     let newAchievements = [...safeAchievements];
-    
     if (existingIdx >= 0) {
       newAchievements[existingIdx] = it;
     } else {
       newAchievements = [it, ...newAchievements];
     }
-
     savePortfolio({ ...portfolio, achievements: newAchievements });
   };
 
   const deleteAchievement = (id) => {
     const safeAchievements = Array.isArray(portfolio.achievements) ? portfolio.achievements : [];
     savePortfolio({ ...portfolio, achievements: safeAchievements.filter(a => a.id !== id) });
-  };
-
-  const handleExportPDF = () => {
-    window.print();
   };
 
   if (loading) return null;
@@ -245,7 +238,7 @@ export default function Portfolio() {
           subtitle={user?.name || ''}
           actions={
             <div className="actions-row" style={{ display: 'flex', gap: 12 }}>
-              <Button variant="outline" size="sm" icon="arrowRight" onClick={handleExportPDF}>Экспортировать PDF</Button>
+              <Button variant="outline" size="sm" icon="arrowRight" onClick={() => window.print()}>Экспортировать PDF</Button>
               <Button variant="primary" size="sm" icon="plus" onClick={() => setShowAdd(true)}>Добавить</Button>
             </div>
           }
@@ -254,7 +247,7 @@ export default function Portfolio() {
 
       <div className="grid-layout" style={{ padding: 32, display: 'grid', gridTemplateColumns: '1fr 320px', gap: 24, maxWidth: 1200, margin: '0 auto' }}>
         <div>
-          
+
           <div className="stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 28 }}>
             {[
               { v: '87%', l: 'Среднее совпадение' },
@@ -280,7 +273,7 @@ export default function Portfolio() {
                 <div style={{ fontFamily: C.font, fontSize: 15, color: C.ink500, marginTop: 4 }}>{user?.grade} · {user?.city}</div>
               </div>
             </div>
-            
+
             <div style={{ marginBottom: 32 }}>
               <div style={{ fontFamily: C.font, fontSize: 16, fontWeight: 700, color: C.ink900, marginBottom: 12 }}>О себе</div>
               <p style={{ fontFamily: C.font, fontSize: 15, lineHeight: 1.6, color: C.ink700, margin: 0 }}>
@@ -294,8 +287,8 @@ export default function Portfolio() {
                 <Button variant="ghost" size="sm" className="no-print" style={{ color: C.blue, fontSize: 13 }} onClick={() => setShowProfileEdit(true)}>Редактировать</Button>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {Array.isArray(portfolio.skills) && portfolio.skills.length > 0 
-                  ? portfolio.skills.map(s => <Chip key={s}>{s}</Chip>) 
+                {Array.isArray(portfolio.skills) && portfolio.skills.length > 0
+                  ? portfolio.skills.map(s => <Chip key={s}>{s}</Chip>)
                   : <span style={{ color: C.ink300, fontSize: 14 }}>Навыки еще не добавлены</span>}
                 <button className="no-print" onClick={() => setShowProfileEdit(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 4, border: `1px dashed ${C.blue}`, background: 'transparent', color: C.blue, fontFamily: C.font, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
                   <Icon name="plus" size={12} color={C.blue} /> Добавить
@@ -312,13 +305,13 @@ export default function Portfolio() {
             <Button variant="secondary" size="sm" icon="plus" className="no-print" onClick={() => setShowAdd(true)}>Добавить</Button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {Array.isArray(portfolio.achievements) ? portfolio.achievements.map(it => {
-              const t = TONE[it.tone] || TONE.blue;
+            {Array.isArray(portfolio.achievements) && portfolio.achievements.map(it => {
+              const tone = TONE[it.tone] || TONE.blue;
               return (
-                <Card key={it.id} padding={18}>
+                <Card key={it.id} padding={18} className="card-root">
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                    <div style={{ width: 48, height: 48, borderRadius: 12, background: t.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <Icon name={it.icon} size={24} color={t.fg} strokeWidth={1.75} />
+                    <div style={{ width: 48, height: 48, borderRadius: 12, background: tone.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Icon name={it.icon} size={24} color={tone.fg} strokeWidth={1.75} />
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontFamily: C.font, fontSize: 15, fontWeight: 700, color: C.ink900 }}>{it.title}</div>
@@ -328,7 +321,7 @@ export default function Portfolio() {
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span style={{ fontFamily: '"Geist Mono",monospace', fontSize: 12, color: C.ink300 }}>{it.year}</span>
-                      <button 
+                      <button
                         onClick={() => setEditingItem(it)}
                         style={{ width: 32, height: 32, borderRadius: 6, background: C.mist, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                       >
@@ -338,11 +331,11 @@ export default function Portfolio() {
                   </div>
                 </Card>
               );
-            }) : null}
+            })}
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div className="sidebar-column" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <Card>
             <div style={{ fontFamily: C.font, fontSize: 13, fontWeight: 700, color: C.ink900, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Icon name="target" size={15} color={C.blue} />
@@ -387,18 +380,18 @@ export default function Portfolio() {
 
       {showAdd && <AchievementModal onClose={() => setShowAdd(false)} onSave={saveAchievement} />}
       {editingItem && (
-        <AchievementModal 
-          initialData={editingItem} 
-          onClose={() => setEditingItem(null)} 
-          onSave={saveAchievement} 
+        <AchievementModal
+          initialData={editingItem}
+          onClose={() => setEditingItem(null)}
+          onSave={saveAchievement}
           onDelete={deleteAchievement}
         />
       )}
       {showProfileEdit && (
-        <ProfileModal 
-          initialData={portfolio} 
-          onClose={() => setShowProfileEdit(false)} 
-          onSave={savePortfolio} 
+        <ProfileModal
+          initialData={portfolio}
+          onClose={() => setShowProfileEdit(false)}
+          onSave={savePortfolio}
         />
       )}
     </div>

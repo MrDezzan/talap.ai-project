@@ -49,9 +49,22 @@ export function AuthProvider({ children }) {
 
   const analyzeProfile = async (profileData) => {
     try {
-      const data = await api.post('/api/ai/analyze', profileData);
+      const data = await api.post('/api/ai/analyze', profileData || {});
       setAiProfile(data);
       localStorage.setItem('talap_ai_profile', JSON.stringify(data));
+      return data;
+    } catch (err) {
+      return { error: err.message };
+    }
+  };
+
+  const updateUser = async (userData) => {
+    try {
+      const data = await api.put('/api/me', userData);
+      setUser(data);
+      localStorage.setItem('talap_user', JSON.stringify(data));
+      // Trigger AI re-analysis after profile update
+      await analyzeProfile();
       return data;
     } catch (err) {
       return { error: err.message };
@@ -67,7 +80,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, analyzeProfile, logout, loading, aiProfile }}>
+    <AuthContext.Provider value={{ user, login, register, analyzeProfile, updateUser, logout, loading, aiProfile }}>
       {children}
     </AuthContext.Provider>
   );
