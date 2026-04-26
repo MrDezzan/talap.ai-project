@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -74,10 +75,14 @@ func main() {
 	// Serve Static Files for Production
 	r.Static("/assets", "./dist/assets")
 	r.StaticFile("/logo.svg", "./dist/logo.svg")
+	r.StaticFile("/favicon.ico", "./dist/favicon.ico")
+	
 	r.NoRoute(func(c *gin.Context) {
-		if !strings.HasPrefix(c.Request.URL.Path, "/api") {
-			c.File("./dist/index.html")
+		if strings.HasPrefix(c.Request.URL.Path, "/api") {
+			c.JSON(http.StatusNotFound, gin.H{"error": "API route not found"})
+			return
 		}
+		c.File("./dist/index.html")
 	})
 
 	port := os.Getenv("PORT")
