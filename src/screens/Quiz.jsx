@@ -56,13 +56,10 @@ const QUESTIONS = [
   }
 ];
 
-import { useMobile } from '../hooks/useMobile';
-
 export default function Quiz() {
   const navigate = useNavigate();
   const { analyzeProfile } = useAuth();
   const { t, lang } = useLanguage();
-  const isMobile = useMobile();
   
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -161,7 +158,7 @@ export default function Quiz() {
           </h1>
           <p style={{ fontFamily: C.font, fontSize: 16, color: C.ink500, marginBottom: 40 }}>Выбери один вариант, который лучше всего тебя описывает.</p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 12 : 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
             {currentQ.options.map((opt, i) => (
               <button
                 key={opt.id}

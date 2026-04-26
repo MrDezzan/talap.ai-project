@@ -41,13 +41,10 @@ function Field({ label, type = 'text', value, onChange, placeholder, error, auto
   );
 }
 
-import { useMobile } from '../hooks/useMobile';
-
 export default function Login() {
   const { login, loginWithToken } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const isMobile = useMobile();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -60,12 +57,8 @@ export default function Login() {
       localStorage.setItem('token', token);
       const sync = async () => {
         try {
-          const userData = await loginWithToken(token);
-          if (!userData.grade) {
-            navigate('/register?step=1');
-          } else {
-            navigate('/dashboard');
-          }
+          await loginWithToken(token);
+          navigate('/dashboard');
         } catch (e) {
           console.error('Sync failed', e);
         }
@@ -102,7 +95,7 @@ export default function Login() {
     window.location.href = url;
   };
 
-
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
 
   return (
     <div style={{ 

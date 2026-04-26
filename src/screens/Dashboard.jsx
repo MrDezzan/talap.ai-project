@@ -24,13 +24,10 @@ function toneFor(deadline) {
   return deadline <= 14 ? 'warn' : '';
 }
 
-import { useMobile } from '../hooks/useMobile';
-
 export default function Dashboard() {
   const { aiProfile, user } = useAuth();
   const navigate = useNavigate();
   const { t, lang } = useLanguage();
-  const isMobile = useMobile();
   const [showNotifications, setShowNotifications] = useState(false);
 
   const firstName = user?.name?.split(' ')[0] || 'Студент';
@@ -63,7 +60,7 @@ export default function Dashboard() {
       ];
 
   const topGrant = aiProfile?.grants?.[0];
-
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
 
   return (
     <div style={{ flex: 1, overflow: 'auto', background: C.mist, display: 'flex', flexDirection: 'column' }}>
