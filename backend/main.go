@@ -44,6 +44,7 @@ func main() {
 		corsConfig.AllowOrigins = strings.Split(allowedOrigin, ",")
 	}
 
+	r.Use(gin.Logger())
 	r.Use(cors.New(corsConfig))
 
 	api := r.Group("/api")

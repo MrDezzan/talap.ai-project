@@ -1,4 +1,12 @@
-const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const getBaseURL = () => {
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:8080/api';
+  }
+  return '/api';
+};
+
+const BASE = getBaseURL();
 
 function token() {
   return localStorage.getItem('token');
