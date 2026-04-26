@@ -98,8 +98,10 @@ export default function Login() {
   }, []);
 
   const handleGoogleLogin = () => {
+    console.log("Google Login clicked");
     const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-    window.location.href = `${apiBase}/api/auth/google/login`;
+    const url = apiBase.startsWith('http') ? `${apiBase}/api/auth/google/login` : `/api/auth/google/login`;
+    window.location.href = url;
   };
 
   return (
@@ -149,12 +151,16 @@ export default function Login() {
         </div>
 
         <button 
+          type="button"
           onClick={handleGoogleLogin}
           style={{
             width: '100%', padding: '11px 16px', borderRadius: 8, border: `1px solid ${C.hairline}`,
             background: C.paper, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
             fontFamily: C.font, fontSize: 15, fontWeight: 600, color: C.ink900, cursor: 'pointer',
+            transition: 'background-color 150ms',
           }}
+          onMouseOver={e => e.currentTarget.style.background = C.mist}
+          onMouseOut={e => e.currentTarget.style.background = C.paper}
         >
           <svg width="18" height="18" viewBox="0 0 18 18">
             <path d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.06-.66-.15-1.17z" fill="#4285F4"/>
