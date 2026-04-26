@@ -84,7 +84,7 @@ export default function Roadmap() {
               <Icon name="target" size={40} color={C.blue} strokeWidth={1.5} />
             </div>
             <h2 style={{ fontFamily: C.font, fontSize: 24, fontWeight: 800, color: C.ink900, marginBottom: 16 }}>{t('dash_roadmap_empty')}</h2>
-            <Button variant="primary" size="lg" onClick={() => navigate('/portfolio')}>{lang === 'en' ? 'Go to Portfolio' : lang === 'kz' ? 'Портфолиоға өту' : 'Перейти в портфолио'}</Button>
+            <Button variant="primary" size="lg" onClick={() => navigate('/portfolio')}>{t('port_go_to')}</Button>
           </div>
         )}
       </div>

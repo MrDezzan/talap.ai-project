@@ -7,6 +7,7 @@ import Button from '../components/Button';
 import Progress from '../components/Progress';
 import Avatar from '../components/Avatar';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { api } from '../lib/api';
 
 const C = {
@@ -26,6 +27,7 @@ const TONE = {
 };
 
 function ProfileModal({ onClose, onSave, initialData }) {
+  const { t } = useLanguage();
   const [bio, setBio] = useState(initialData.bio || '');
   const [ent, setEnt] = useState(initialData.ent || '');
   const [english, setEnglish] = useState(initialData.english || '');
@@ -55,33 +57,33 @@ function ProfileModal({ onClose, onSave, initialData }) {
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(10,18,48,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, backdropFilter: 'blur(4px)', padding: 24 }}>
       <div onClick={e => e.stopPropagation()} style={{ background: C.paper, borderRadius: 20, width: '100%', maxWidth: 500, boxShadow: '0 32px 80px rgba(10,18,48,0.2)' }}>
         <div style={{ padding: '24px 28px', borderBottom: `1px solid ${C.hairline}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ fontFamily: C.font, fontSize: 18, fontWeight: 700, color: C.ink900 }}>Редактировать профиль</div>
+          <div style={{ fontFamily: C.font, fontSize: 18, fontWeight: 700, color: C.ink900 }}>{t('port_edit_profile')}</div>
           <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, background: C.mist, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Icon name="plus" size={16} color={C.ink500} style={{ transform: 'rotate(45deg)' }} />
           </button>
         </div>
         <div style={{ padding: 28 }}>
           <div style={{ marginBottom: 20 }}>
-            <label style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, display: 'block', marginBottom: 6 }}>О себе</label>
+            <label style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, display: 'block', marginBottom: 6 }}>{t('port_bio')}</label>
             <textarea
               value={bio}
               onChange={e => setBio(e.target.value)}
-              placeholder="Расскажи о своих интересах..."
+              placeholder={t('port_bio_placeholder')}
               style={{ width: '100%', padding: 12, borderRadius: 8, border: `1px solid ${C.hairline}`, fontFamily: C.font, fontSize: 14, minHeight: 80, outline: 'none' }}
             />
           </div>
           <div style={{ display: 'flex', gap: 16, marginBottom: 20 }}>
             <div style={{ flex: 1 }}>
-              <label style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, display: 'block', marginBottom: 6 }}>Балл ЕНТ</label>
-              <input value={ent} onChange={e => setEnt(e.target.value)} placeholder="Например: 132" style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: `1px solid ${C.hairline}`, fontFamily: C.font, fontSize: 14, outline: 'none', boxSizing: 'border-box' }} />
+              <label style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, display: 'block', marginBottom: 6 }}>{t('port_ent')}</label>
+              <input value={ent} onChange={e => setEnt(e.target.value)} placeholder="140" style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: `1px solid ${C.hairline}`, fontFamily: C.font, fontSize: 14, outline: 'none', boxSizing: 'border-box' }} />
             </div>
             <div style={{ flex: 1 }}>
-              <label style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, display: 'block', marginBottom: 6 }}>Английский</label>
-              <input value={english} onChange={e => setEnglish(e.target.value)} placeholder="Например: B2 (IELTS 6.5)" style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: `1px solid ${C.hairline}`, fontFamily: C.font, fontSize: 14, outline: 'none', boxSizing: 'border-box' }} />
+              <label style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, display: 'block', marginBottom: 6 }}>English</label>
+              <input value={english} onChange={e => setEnglish(e.target.value)} placeholder="IELTS / Duolingo / CEFR" style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: `1px solid ${C.hairline}`, fontFamily: C.font, fontSize: 14, outline: 'none', boxSizing: 'border-box' }} />
             </div>
           </div>
           <div style={{ marginBottom: 24 }}>
-            <label style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, display: 'block', marginBottom: 6 }}>Навыки</label>
+            <label style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, display: 'block', marginBottom: 6 }}>{t('port_skills')}</label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
               {skills.map(s => (
                 <Chip key={s} onClick={() => setSkills(skills.filter(x => x !== s))}>{s} ✕</Chip>
@@ -92,16 +94,16 @@ function ProfileModal({ onClose, onSave, initialData }) {
                 value={newSkill}
                 onChange={e => setNewSkill(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && addSkill()}
-                placeholder="Добавить навык..."
+                placeholder={t('port_add_skill')}
                 style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.hairline}`, fontFamily: C.font, fontSize: 14, outline: 'none' }}
               />
-              <Button size="sm" onClick={addSkill}>Добавить</Button>
+              <Button size="sm" onClick={addSkill}>{t('port_add')}</Button>
             </div>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
-            <Button variant="outline" style={{ flex: 1 }} onClick={onClose} disabled={saving}>Отмена</Button>
+            <Button variant="outline" style={{ flex: 1 }} onClick={onClose} disabled={saving}>{t('port_cancel')}</Button>
             <Button variant="primary" style={{ flex: 2 }} onClick={handleSave} disabled={saving}>
-              {saving ? 'Анализируем...' : 'Сохранить изменения'}
+              {saving ? t('port_analyzing') : t('port_save')}
             </Button>
           </div>
         </div>
@@ -111,6 +113,7 @@ function ProfileModal({ onClose, onSave, initialData }) {
 }
 
 function AchievementModal({ onClose, onSave, onDelete, initialData }) {
+  const { t } = useLanguage();
   const [title, setTitle] = useState(initialData?.title || '');
   const [org, setOrg] = useState(initialData?.org || '');
   const [rank, setRank] = useState(initialData?.rank || '');
@@ -154,7 +157,7 @@ function AchievementModal({ onClose, onSave, onDelete, initialData }) {
       <div onClick={e => e.stopPropagation()} style={{ background: C.paper, borderRadius: 20, width: '100%', maxWidth: 480, boxShadow: '0 32px 80px rgba(10,18,48,0.2)' }}>
         <div style={{ padding: '24px 28px', borderBottom: `1px solid ${C.hairline}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ fontFamily: C.font, fontSize: 18, fontWeight: 700, color: C.ink900 }}>
-            {initialData ? 'Редактировать' : 'Добавить достижение'}
+            {initialData ? t('port_edit') : t('port_add_achievement')}
           </div>
           <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, background: C.mist, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Icon name="plus" size={16} color={C.ink500} style={{ transform: 'rotate(45deg)' }} />
@@ -162,21 +165,21 @@ function AchievementModal({ onClose, onSave, onDelete, initialData }) {
         </div>
         <div style={{ padding: 28 }}>
           <div style={{ marginBottom: 16 }}>
-            <label style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, display: 'block', marginBottom: 6 }}>Название</label>
-            <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Олимпиада, курс, хакатон..." onFocus={() => setFocused('title')} onBlur={() => setFocused('')} style={inputStyle('title')} autoFocus />
+            <label style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, display: 'block', marginBottom: 6 }}>{t('port_achievement_name')}</label>
+            <input value={title} onChange={e => setTitle(e.target.value)} placeholder="..." onFocus={() => setFocused('title')} onBlur={() => setFocused('')} style={inputStyle('title')} autoFocus />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
             <div>
-              <label style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, display: 'block', marginBottom: 6 }}>Организация</label>
-              <input value={org} onChange={e => setOrg(e.target.value)} placeholder="Stepik, НУ..." onFocus={() => setFocused('org')} onBlur={() => setFocused('')} style={inputStyle('org')} />
+              <label style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, display: 'block', marginBottom: 6 }}>{t('port_org')}</label>
+              <input value={org} onChange={e => setOrg(e.target.value)} placeholder="..." onFocus={() => setFocused('org')} onBlur={() => setFocused('')} style={inputStyle('org')} />
             </div>
             <div>
-              <label style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, display: 'block', marginBottom: 6 }}>Результат / Место</label>
-              <input value={rank} onChange={e => setRank(e.target.value)} placeholder="1-е место, Победитель..." onFocus={() => setFocused('rank')} onBlur={() => setFocused('')} style={inputStyle('rank')} />
+              <label style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, display: 'block', marginBottom: 6 }}>{t('port_rank')}</label>
+              <input value={rank} onChange={e => setRank(e.target.value)} placeholder="..." onFocus={() => setFocused('rank')} onBlur={() => setFocused('')} style={inputStyle('rank')} />
             </div>
           </div>
           <div style={{ marginBottom: 24 }}>
-            <label style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, display: 'block', marginBottom: 6 }}>Год</label>
+            <label style={{ fontFamily: C.font, fontSize: 13, fontWeight: 600, color: C.ink700, display: 'block', marginBottom: 6 }}>{t('port_year')}</label>
             <select value={year} onChange={e => setYear(e.target.value)} style={{ ...inputStyle('year'), appearance: 'none', cursor: 'pointer' }}>
               {years.map(y => <option key={y}>{y}</option>)}
             </select>
@@ -184,11 +187,11 @@ function AchievementModal({ onClose, onSave, onDelete, initialData }) {
           <div style={{ display: 'flex', gap: 10 }}>
             {initialData && (
               <Button variant="outline" size="md" style={{ flex: 1, borderColor: '#FDA29B', color: '#B42318' }} onClick={() => { onDelete(initialData.id); onClose(); }}>
-                Удалить
+                {t('port_delete')}
               </Button>
             )}
             <Button variant="primary" size="md" style={{ flex: initialData ? 2 : 1 }} onClick={handleSave} disabled={saving}>
-              {saving ? '...' : (initialData ? 'Сохранить' : 'Добавить')}
+              {saving ? '...' : (initialData ? t('port_save') : t('port_add'))}
             </Button>
           </div>
         </div>
@@ -199,6 +202,7 @@ function AchievementModal({ onClose, onSave, onDelete, initialData }) {
 
 export default function Portfolio() {
   const { user, analyzeProfile } = useAuth();
+  const { t } = useLanguage();
   const [portfolio, setPortfolio] = useState({ bio: '', ent: '', english: '', skills: [], achievements: [] });
   const [loading, setLoading] = useState(true);
   const [editingItem, setEditingItem] = useState(null);
@@ -281,12 +285,12 @@ export default function Portfolio() {
       `}</style>
       <div className="top-bar">
         <TopBar
-          title="Портфолио"
+          title={t('nav_portfolio')}
           subtitle={user?.name || ''}
           actions={
             <div className="actions-row" style={{ display: 'flex', gap: 12 }}>
-              <Button variant="outline" size="sm" icon="arrowRight" onClick={() => window.print()}>Экспортировать PDF</Button>
-              <Button variant="primary" size="sm" icon="plus" onClick={() => setShowAdd(true)}>Добавить</Button>
+              <Button variant="outline" size="sm" icon="arrowRight" onClick={() => window.print()}>{t('port_export_pdf')}</Button>
+              <Button variant="primary" size="sm" icon="plus" onClick={() => setShowAdd(true)}>{t('port_add')}</Button>
             </div>
           }
         />
@@ -297,10 +301,10 @@ export default function Portfolio() {
 
           <div className="stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 28 }}>
             {[
-              { v: '87%', l: 'Среднее совпадение' },
-              { v: Array.isArray(portfolio.achievements) ? portfolio.achievements.length : 0, l: 'Достижения' },
-              { v: Array.isArray(portfolio.skills) ? portfolio.skills.length : 0, l: 'Умений' },
-              { v: '3', l: 'Гранта подходит' },
+              { v: '87%', l: t('port_avg_match') },
+              { v: Array.isArray(portfolio.achievements) ? portfolio.achievements.length : 0, l: t('port_achievements_count') },
+              { v: Array.isArray(portfolio.skills) ? portfolio.skills.length : 0, l: t('port_skills_count') },
+              { v: '3', l: t('port_grants_matched') },
             ].map((s, i) => (
               <Card key={i} padding={16} className="card-root">
                 <div style={{ fontFamily: C.font, fontSize: 28, fontWeight: 800, letterSpacing: '-0.025em', color: C.ink900 }}>{s.v}</div>
@@ -311,7 +315,7 @@ export default function Portfolio() {
 
           <Card padding={24} style={{ marginBottom: 24, position: 'relative' }} className="card-root">
             <div className="no-print" style={{ position: 'absolute', top: 32, right: 32 }}>
-              <Button variant="outline" size="sm" icon="settings" onClick={() => setShowProfileEdit(true)}>Редактировать</Button>
+              <Button variant="outline" size="sm" icon="settings" onClick={() => setShowProfileEdit(true)}>{t('port_edit')}</Button>
             </div>
             <div style={{ display: 'flex', gap: 24, alignItems: 'center', marginBottom: 32 }}>
               <Avatar name={user?.name} size={84} />
@@ -322,23 +326,23 @@ export default function Portfolio() {
             </div>
 
             <div style={{ marginBottom: 32 }}>
-              <div style={{ fontFamily: C.font, fontSize: 16, fontWeight: 700, color: C.ink900, marginBottom: 12 }}>О себе</div>
+              <div style={{ fontFamily: C.font, fontSize: 16, fontWeight: 700, color: C.ink900, marginBottom: 12 }}>{t('port_bio')}</div>
               <p style={{ fontFamily: C.font, fontSize: 15, lineHeight: 1.6, color: C.ink700, margin: 0 }}>
-                {portfolio.bio || 'Напиши пару слов о своих целях и интересах.'}
+                {portfolio.bio || t('port_bio_placeholder')}
               </p>
             </div>
 
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                <div style={{ fontFamily: C.font, fontSize: 16, fontWeight: 700, color: C.ink900 }}>Умения</div>
-                <Button variant="ghost" size="sm" className="no-print" style={{ color: C.blue, fontSize: 13 }} onClick={() => setShowProfileEdit(true)}>Редактировать</Button>
+                <div style={{ fontFamily: C.font, fontSize: 16, fontWeight: 700, color: C.ink900 }}>{t('port_skills')}</div>
+                <Button variant="ghost" size="sm" className="no-print" style={{ color: C.blue, fontSize: 13 }} onClick={() => setShowProfileEdit(true)}>{t('port_edit')}</Button>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {Array.isArray(portfolio.skills) && portfolio.skills.length > 0
                   ? portfolio.skills.map(s => <Chip key={s}>{s}</Chip>)
-                  : <span style={{ color: C.ink300, fontSize: 14 }}>Навыки еще не добавлены</span>}
+                  : <span style={{ color: C.ink300, fontSize: 14 }}>{t('port_no_skills')}</span>}
                 <button className="no-print" onClick={() => setShowProfileEdit(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 4, border: `1px dashed ${C.blue}`, background: 'transparent', color: C.blue, fontFamily: C.font, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-                  <Icon name="plus" size={12} color={C.blue} /> Добавить
+                  <Icon name="plus" size={12} color={C.blue} /> {t('port_add')}
                 </button>
               </div>
             </div>
@@ -346,10 +350,10 @@ export default function Portfolio() {
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-              <div style={{ fontFamily: C.font, fontSize: 16, fontWeight: 700, color: C.ink900 }}>Достижения</div>
-              <span style={{ fontFamily: C.font, fontSize: 13, color: C.ink500 }}>{Array.isArray(portfolio.achievements) ? portfolio.achievements.length : 0} записей</span>
+              <div style={{ fontFamily: C.font, fontSize: 16, fontWeight: 700, color: C.ink900 }}>{t('port_achievements')}</div>
+              <span style={{ fontFamily: C.font, fontSize: 13, color: C.ink500 }}>{Array.isArray(portfolio.achievements) ? portfolio.achievements.length : 0} {t('port_achievements_records')}</span>
             </div>
-            <Button variant="secondary" size="sm" icon="plus" className="no-print" onClick={() => setShowAdd(true)}>Добавить</Button>
+            <Button variant="secondary" size="sm" icon="plus" className="no-print" onClick={() => setShowAdd(true)}>{t('port_add')}</Button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {Array.isArray(portfolio.achievements) && portfolio.achievements.map(it => {
@@ -386,7 +390,7 @@ export default function Portfolio() {
           <Card>
             <div style={{ fontFamily: C.font, fontSize: 13, fontWeight: 700, color: C.ink900, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Icon name="target" size={15} color={C.blue} />
-              Готовность для грантов
+              {t('port_readiness_grants')}
             </div>
             {[
               { label: 'Болашак', v: 87 },
@@ -401,11 +405,11 @@ export default function Portfolio() {
                 <Progress value={g.v} height={4} />
               </div>
             ))}
-            <Button variant="primary" size="sm" fullWidth style={{ marginTop: 4 }}>Посмотреть гранты</Button>
+            <Button variant="primary" size="sm" fullWidth style={{ marginTop: 4 }} onClick={() => navigate('/grants')}>{t('dash_view_grants')}</Button>
           </Card>
 
           <Card>
-            <div style={{ fontFamily: C.font, fontSize: 13, fontWeight: 700, color: C.ink900, marginBottom: 12 }}>Что добавить</div>
+            <div style={{ fontFamily: C.font, fontSize: 13, fontWeight: 700, color: C.ink900, marginBottom: 12 }}>{t('port_what_to_add')}</div>
             {[
               { icon: 'graduation', text: 'Диплом или сертификат', hint: 'Увеличит match на 8%' },
               { icon: 'globe', text: 'Языковой сертификат', hint: 'Обязателен для Болашак' },

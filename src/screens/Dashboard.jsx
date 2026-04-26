@@ -1,6 +1,7 @@
-import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import Icon from '../components/Icon';
 import TopBar from '../components/TopBar';
 import Search from '../components/Search';
@@ -26,36 +27,36 @@ function toneFor(deadline) {
 export default function Dashboard() {
   const { aiProfile, user } = useAuth();
   const navigate = useNavigate();
+  const { t, lang } = useLanguage();
   const [showNotifications, setShowNotifications] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
 
   const firstName = user?.name?.split(' ')[0] || 'Студент';
 
   const stats = aiProfile
     ? [
         {
-          label: 'Подходящих грантов',
+          label: t('dash_grants_match_label') || 'Подходящих грантов',
           value: String(aiProfile.grants?.length || 0),
-          delta: `топ ${aiProfile.grants?.[0]?.match_percentage || 0}% совпадение`,
+          delta: `топ ${aiProfile.grants?.[0]?.match_percentage || 0}% ${t('cat_match')}`,
           icon: 'award',
         },
         {
-          label: 'Профессий подобрано',
+          label: t('dash_prof_matched_label') || 'Профессий подобрано',
           value: String(aiProfile.professions?.length || 0),
           delta: aiProfile.top_profession || '',
           icon: 'compass',
         },
         {
-          label: 'Шагов в маршруте',
+          label: t('dash_roadmap_steps_label') || 'Шагов в маршруте',
           value: String(aiProfile.roadmap?.length || 0),
-          delta: 'персональный план',
+          delta: t('dash_personal_plan') || 'персональный план',
           icon: 'target',
         },
       ]
     : [
-        { label: 'Подходящих грантов', value: '—', delta: 'зарегистрируйся для анализа', icon: 'award' },
-        { label: 'Профессий в фокусе', value: '—', delta: '', icon: 'compass' },
-        { label: 'Готовность портфолио', value: '—', delta: '', icon: 'trophy' },
+        { label: t('dash_grants_match_label') || 'Подходящих грантов', value: '—', delta: t('dash_auth_required'), icon: 'award' },
+        { label: t('dash_prof_matched_label') || 'Профессий подобрано', value: '—', delta: '', icon: 'compass' },
+        { label: t('dash_portfolio_ready_label') || 'Готовность портфолио', value: '—', delta: '', icon: 'trophy' },
       ];
 
   const topGrant = aiProfile?.grants?.[0];
@@ -63,15 +64,10 @@ export default function Dashboard() {
   return (
     <div style={{ flex: 1, overflow: 'auto', background: C.mist, display: 'flex', flexDirection: 'column' }}>
       <TopBar
-        subtitle={`Сәлем, ${firstName}`}
-        title="Что нового сегодня"
+        subtitle={`${t('dash_welcome')} ${firstName}`}
+        title={t('dash_whats_new')}
         actions={
           <>
-            <Search 
-              value={searchQuery} 
-              onChange={setSearchQuery} 
-              onEnter={() => navigate(`/professions?q=${searchQuery}`)} 
-            />
             <div style={{ position: 'relative' }}>
               <button 
                 onClick={() => setShowNotifications(!showNotifications)}
@@ -95,8 +91,8 @@ export default function Dashboard() {
                   border: `1px solid ${C.hairline}`, zIndex: 100, padding: 12
                 }}>
                   <div style={{ fontFamily: C.font, fontSize: 13, fontWeight: 700, color: C.ink900, marginBottom: 12, display: 'flex', justifyContent: 'space-between' }}>
-                    Уведомления
-                    <span style={{ color: C.blue, fontSize: 11, cursor: 'pointer' }} onClick={() => setShowNotifications(false)}>Закрыть</span>
+                    {t('dash_notifications')}
+                    <span style={{ color: C.blue, fontSize: 11, cursor: 'pointer' }} onClick={() => setShowNotifications(false)}>{t('dash_close')}</span>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {[
@@ -126,7 +122,7 @@ export default function Dashboard() {
 
           <Mesh intensity={0.85} style={{ borderRadius: 16, padding: 28, minHeight: 200 }}>
             <Chip dot tone="ai" style={{ background: 'rgba(255,255,255,0.2)', color: 'white', backdropFilter: 'blur(10px)' }}>
-              Talap советует
+              {t('grants_ai_tip')}
             </Chip>
             <div style={{
               fontFamily: C.font, fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em',
@@ -134,29 +130,29 @@ export default function Dashboard() {
             }}>
               {aiProfile
                 ? (topGrant
-                  ? `«${topGrant.name}» — совпадение ${topGrant.match_percentage}%`
+                  ? `«${topGrant.name}» — ${t('cat_match')} ${topGrant.match_percentage}%`
                   : aiProfile.summary?.split('.')[0])
-                : 'Создай профиль — AI подберёт гранты и карьерный путь'}
+                : t('dash_hero_no_auth_title')}
             </div>
             <div style={{ fontFamily: C.font, fontSize: 14, color: 'rgba(255,255,255,0.85)', marginTop: 8, lineHeight: 1.6, maxWidth: 500 }}>
               {aiProfile
                 ? (topGrant
                   ? topGrant.description || aiProfile.summary
                   : aiProfile.summary)
-                : 'Talap анализирует твои интересы, оценки и цели — и строит персональный план.'}
+                : t('dash_hero_no_auth_desc')}
             </div>
             <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
               {aiProfile
                 ? <>
                     <Button variant="primary" style={{ background: 'white', color: C.blue }} onClick={() => navigate('/grants')}>
-                      Посмотреть гранты
+                      {t('dash_view_grants')}
                     </Button>
                     <Button variant="ghost" icon="sparkles" style={{ color: 'white' }} onClick={() => navigate('/chat')}>
-                      Спросить AI
+                      {t('cat_modal_ask_ai')}
                     </Button>
                   </>
                 : <Button variant="primary" style={{ background: 'white', color: C.blue }} onClick={() => navigate('/quiz')}>
-                    Пройти тест профориентации
+                    {t('cat_quiz_btn')}
                   </Button>
               }
             </div>
@@ -183,13 +179,13 @@ export default function Dashboard() {
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 14 }}>
                 <div style={{ fontFamily: C.font, fontSize: 16, fontWeight: 700, letterSpacing: '-0.015em', color: C.ink900 }}>
-                  Рекомендованные гранты
+                  {t('dash_grants_title')}
                 </div>
                 <span
                   onClick={() => navigate('/grants')}
                   style={{ fontFamily: C.font, fontSize: 13, color: C.blue, fontWeight: 600, cursor: 'pointer' }}
                 >
-                  Все →
+                  {t('all')} →
                 </span>
               </div>
               <Card padding={0}>
@@ -213,10 +209,10 @@ export default function Dashboard() {
                       <Progress value={g.match_percentage} style={{ marginTop: 4 }} />
                     </div>
                     <Chip tone={g.tone || toneFor(g.deadline_days)} dot>
-                      До дедлайна {g.deadline_days} дн.
+                      {t('dash_days_left')} {g.deadline_days} {t('days')}
                     </Chip>
                     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                      <Button variant="outline" size="sm" onClick={() => navigate('/grants')}>Открыть</Button>
+                      <Button variant="outline" size="sm" onClick={() => navigate('/grants')}>{t('dash_open')}</Button>
                     </div>
                   </div>
                 ))}
@@ -227,7 +223,7 @@ export default function Dashboard() {
           {aiProfile?.professions?.length > 0 && (
             <div>
               <div style={{ fontFamily: C.font, fontSize: 16, fontWeight: 700, letterSpacing: '-0.015em', color: C.ink900, marginBottom: 14 }}>
-                Подходящие профессии
+                {t('dash_professions_title')}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
                 {aiProfile.professions.map((p, i) => (
@@ -259,7 +255,7 @@ export default function Dashboard() {
             <Card>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
                 <Icon name="target" size={16} color={C.blue} />
-                <div style={{ fontFamily: C.font, fontSize: 13, fontWeight: 700, color: C.ink900 }}>Твой маршрут</div>
+                <div style={{ fontFamily: C.font, fontSize: 13, fontWeight: 700, color: C.ink900 }}>{t('nav_roadmap')}</div>
               </div>
               {aiProfile.roadmap.slice(0, 3).map((s, i) => (
                 <div key={i} style={{ display: 'flex', gap: 10, paddingBottom: 14, marginBottom: i < 2 ? 14 : 0, borderBottom: i < 2 ? `1px solid ${C.hairline}` : 'none' }}>
@@ -277,28 +273,28 @@ export default function Dashboard() {
                 </div>
               ))}
               <Button variant="primary" size="sm" style={{ marginTop: 4, width: '100%' }} onClick={() => navigate('/roadmap')}>
-                Полный маршрут
+                {t('dash_full_roadmap')}
               </Button>
             </Card>
           ) : (
             <Card>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <Icon name="target" size={16} color={C.blue} />
-                <div style={{ fontFamily: C.font, fontSize: 13, fontWeight: 700, color: C.ink900 }}>Тест профориентации</div>
+                <div style={{ fontFamily: C.font, fontSize: 13, fontWeight: 700, color: C.ink900 }}>{t('dash_quiz_promo_title')}</div>
               </div>
               <div style={{ fontFamily: C.font, fontSize: 16, fontWeight: 700, letterSpacing: '-0.015em', color: C.ink900, marginTop: 12 }}>
-                Узнай свою профессию
+                {t('dash_quiz_promo_subtitle')}
               </div>
-              <div style={{ fontFamily: C.font, fontSize: 12, color: C.ink500, marginTop: 4 }}>8 вопросов · ~3 мин · AI-анализ</div>
+              <div style={{ fontFamily: C.font, fontSize: 12, color: C.ink500, marginTop: 4 }}>{t('dash_quiz_promo_stats')}</div>
               <Progress value={0} style={{ marginTop: 12 }} />
-              <Button variant="primary" size="sm" style={{ marginTop: 14, width: '100%' }} onClick={() => navigate('/quiz')}>Начать тест</Button>
+              <Button variant="primary" size="sm" style={{ marginTop: 14, width: '100%' }} onClick={() => navigate('/quiz')}>{t('dash_quiz_start')}</Button>
             </Card>
           )}
 
           {aiProfile?.grants?.length > 0 && (
             <Card>
               <div style={{ fontFamily: C.font, fontSize: 13, fontWeight: 700, color: C.ink900, marginBottom: 12 }}>
-                Ближайшие дедлайны
+                {t('dash_upcoming_deadlines')}
               </div>
               {[...aiProfile.grants]
                 .sort((a, b) => a.deadline_days - b.deadline_days)
@@ -313,7 +309,7 @@ export default function Dashboard() {
                         {g.deadline_days}
                       </div>
                       <div style={{ fontFamily: C.font, fontSize: 9, fontWeight: 600, color: g.deadline_days <= 14 ? C.warn700 : C.blue, textTransform: 'uppercase', marginTop: 2 }}>
-                        дн
+                        {t('days_short')}
                       </div>
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -325,15 +321,15 @@ export default function Dashboard() {
             </Card>
           )}
 
-          <Mesh intensity={0.45} style={{ borderRadius: 12, padding: 18 }}>
+            <Mesh intensity={0.45} style={{ borderRadius: 12, padding: 18 }}>
             <Chip dot tone="ai" style={{ background: 'rgba(255,255,255,0.15)', color: 'white' }}>Talap AI</Chip>
             <div style={{ fontFamily: C.font, fontSize: 14, fontWeight: 600, color: 'white', marginTop: 10, lineHeight: 1.4 }}>
               {aiProfile?.summary
                 ? aiProfile.summary
-                : '«Какую профессию выбрать, если люблю математику и рисование?»'}
+                : t('dash_ai_mesh_empty')}
             </div>
             <Button variant="ai" size="sm" icon="sparkles" style={{ marginTop: 12, width: '100%' }} onClick={() => navigate('/chat')}>
-              Спросить Talap
+              {t('dash_ai_mesh_btn')}
             </Button>
           </Mesh>
         </div>

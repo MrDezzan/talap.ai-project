@@ -98,18 +98,6 @@ export default function Sidebar() {
         ))}
       </div>
 
-      <div style={{ padding: '8px 8px 12px' }}>
-        <div style={{ borderRadius: 12, padding: 14, background: '#1448FF10' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Icon name="sparkles" size={14} color="#1448FF" strokeWidth={2} />
-            <div style={{ fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 700, color: '#0A1230' }}>{t('pro_title')}</div>
-          </div>
-          <div style={{ fontFamily: 'var(--font-sans)', fontSize: 12, color: '#2A3457', marginTop: 4, lineHeight: '16px' }}>
-            {t('pro_desc')}
-          </div>
-          <Button variant="primary" size="sm" style={{ marginTop: 10, width: '100%' }}>{t('pro_btn')}</Button>
-        </div>
-      </div>
 
       <Link to="/settings" style={{ padding: '12px 16px', borderTop: '1px solid #E4E8F1', display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
         <Avatar name={user?.name || 'U'} size={32} />

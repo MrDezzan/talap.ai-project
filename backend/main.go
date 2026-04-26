@@ -52,6 +52,7 @@ func main() {
 
 		api.GET("/grants", handlers.GetGrants(db))
 		api.GET("/professions", handlers.GetProfessions(db))
+		api.GET("/search", handlers.GlobalSearch(db))
 
 		auth := api.Group("/")
 		auth.Use(middleware.AuthRequired())

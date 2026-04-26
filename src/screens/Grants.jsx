@@ -5,6 +5,7 @@ import TopBar from '../components/TopBar';
 import Card from '../components/Card';
 import Chip from '../components/Chip';
 import Button from '../components/Button';
+import Search from '../components/Search';
 import Progress from '../components/Progress';
 import { api } from '../lib/api';
 import { useLanguage } from '../context/LanguageContext';
@@ -95,9 +96,7 @@ function GrantDetailModal({ grant, onClose, t, lang }) {
               <div>
                 <div style={{ fontFamily: C.font, fontSize: 13, fontWeight: 700, color: C.ink900 }}>{t('grants_ai_tip')}</div>
                 <div style={{ fontFamily: C.font, fontSize: 13, lineHeight: '20px', color: C.ink700, marginTop: 2 }}>
-                  {lang === 'en' ? 'Start with IELTS - without it, the application will not be accepted. I picked 3 courses in your city.' :
-                   lang === 'kz' ? 'IELTS-тан бастаңыз - онсыз өтінім қабылданбайды. Мен сіздің қалаңыздағы 3 курсты таңдадым.' :
-                   'Начни с IELTS — без него заявку не примут. Я подобрал 3 курса в твоём городе.'}
+                  {t('grants_ai_tip_desc')}
                 </div>
               </div>
             </div>
@@ -121,16 +120,19 @@ export default function Grants() {
   const [search, setSearch] = useState('');
 
   const FILTERS = [
-    { key: 'all', label: lang === 'en' ? 'All' : lang === 'kz' ? 'Барлығы' : 'Все' },
-    { key: 'Бакалавриат', label: lang === 'en' ? 'Bachelor' : lang === 'kz' ? 'Бакалавриат' : 'Бакалавриат' },
-    { key: 'Магистратура', label: lang === 'en' ? 'Master' : lang === 'kz' ? 'Магистратура' : 'Магистратура' },
+    { key: 'all', label: t('cat_all') },
+    { key: 'Бакалавриат', label: t('grants_bachelor') },
+    { key: 'Магистратура', label: t('grants_master') },
     { key: 'IT', label: 'IT' },
-    { key: 'Бизнес', label: lang === 'en' ? 'Business' : lang === 'kz' ? 'Бизнес' : 'Бизнес' },
-    { key: 'За рубежом', label: lang === 'en' ? 'Abroad' : lang === 'kz' ? 'Шетелде' : 'За рубежом' },
-    { key: 'Казахстан', label: lang === 'en' ? 'Kazakhstan' : lang === 'kz' ? 'Қазақстан' : 'Казахстан' },
+    { key: 'Бизнес', label: t('cat_business') },
+    { key: 'За рубежом', label: t('grants_abroad') },
+    { key: 'Казахстан', label: t('grants_kz') },
   ];
 
   useEffect(() => {
+    const query = new URLSearchParams(window.location.search).get('q');
+    if (query) setSearch(query);
+
     Promise.all([
       api.get('/api/grants'),
       api.get('/api/portfolio')
@@ -158,15 +160,7 @@ export default function Grants() {
         subtitle={`${grants.length} ${t('grants_subtitle')}`}
         actions={
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: C.paper, border: `1px solid ${C.hairline}`, borderRadius: 8, padding: '0 14px', height: 36 }}>
-              <Icon name="search" size={15} color={C.ink500} />
-              <input
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder={t('grants_search')}
-                style={{ border: 'none', outline: 'none', fontFamily: C.font, fontSize: 13, color: C.ink900, background: 'transparent', width: 200 }}
-              />
-            </div>
+            <Search value={search} onChange={setSearch} placeholder={t('grants_search')} />
           </div>
         }
       />

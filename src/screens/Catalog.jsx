@@ -94,17 +94,20 @@ export default function Catalog() {
   const [search, setSearch] = useState('');
 
   const CATEGORIES = [
-    { key: 'all', label: lang === 'en' ? 'All' : lang === 'kz' ? 'Барлығы' : 'Все' },
-    { key: 'IT и данные', label: lang === 'en' ? 'IT & Data' : lang === 'kz' ? 'IT және деректер' : 'IT и данные' },
-    { key: 'Дизайн', label: lang === 'en' ? 'Design' : lang === 'kz' ? 'Дизайн' : 'Дизайн' },
-    { key: 'Бизнес', label: lang === 'en' ? 'Business' : lang === 'kz' ? 'Бизнес' : 'Бизнес' },
-    { key: 'Наука', label: lang === 'en' ? 'Science' : lang === 'kz' ? 'Ғылым' : 'Наука' },
-    { key: 'Образование', label: lang === 'en' ? 'Education' : lang === 'kz' ? 'Білім' : 'Образование' },
-    { key: 'Медицина', label: lang === 'en' ? 'Medicine' : lang === 'kz' ? 'Медицина' : 'Медицина' },
-    { key: 'Инженерия', label: lang === 'en' ? 'Engineering' : lang === 'kz' ? 'Инженерия' : 'Инженерия' },
+    { key: 'all', label: t('cat_all') },
+    { key: 'IT и данные', label: t('cat_it') },
+    { key: 'Дизайн', label: t('cat_design') },
+    { key: 'Бизнес', label: t('cat_business') },
+    { key: 'Наука', label: t('cat_science') },
+    { key: 'Образование', label: t('cat_edu') },
+    { key: 'Медицина', label: t('cat_med') },
+    { key: 'Инженерия', label: t('cat_eng') },
   ];
 
   useEffect(() => {
+    const query = new URLSearchParams(window.location.search).get('q');
+    if (query) setSearch(query);
+
     api.get('/api/professions')
       .then(d => { 
         setProfessions(d); 

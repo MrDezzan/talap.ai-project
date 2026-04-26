@@ -140,17 +140,52 @@ func GetDashboardData(db *gorm.DB) gin.HandlerFunc {
 
 func GetGrants(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		q := c.Query("q")
 		var grants []models.Grant
-		db.Find(&grants)
+		if q != "" {
+			term := "%" + q + "%"
+			db.Where("name ILIKE ? OR subtitle ILIKE ? OR description ILIKE ? OR country ILIKE ? OR array_to_string(tags, ',') ILIKE ?", term, term, term, term, term).Find(&grants)
+		} else {
+			db.Find(&grants)
+		}
 		c.JSON(http.StatusOK, grants)
 	}
 }
 
 func GetProfessions(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		q := c.Query("q")
 		var professions []models.Profession
-		db.Find(&professions)
+		if q != "" {
+			term := "%" + q + "%"
+			db.Where("name ILIKE ? OR description ILIKE ? OR category ILIKE ? OR array_to_string(tags, ',') ILIKE ?", term, term, term, term).Find(&professions)
+		} else {
+			db.Find(&professions)
+		}
 		c.JSON(http.StatusOK, professions)
+	}
+}
+
+func GlobalSearch(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		q := strings.TrimSpace(c.Query("q"))
+		if q == "" {
+			c.JSON(http.StatusOK, gin.H{"grants": []any{}, "professions": []any{}})
+			return
+		}
+
+		term := "%" + strings.ToLower(q) + "%"
+		var grants []models.Grant
+		var professions []models.Profession
+
+		// Use LOWER() for maximum compatibility and robustness
+		db.Where("LOWER(name) LIKE ? OR LOWER(subtitle) LIKE ? OR LOWER(country) LIKE ? OR LOWER(array_to_string(tags, ',')) LIKE ?", term, term, term, term).Limit(10).Find(&grants)
+		db.Where("LOWER(name) LIKE ? OR LOWER(description) LIKE ? OR LOWER(category) LIKE ? OR LOWER(array_to_string(tags, ',')) LIKE ?", term, term, term, term).Limit(10).Find(&professions)
+
+		c.JSON(http.StatusOK, gin.H{
+			"grants":      grants,
+			"professions": professions,
+		})
 	}
 }
 
