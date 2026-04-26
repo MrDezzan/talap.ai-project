@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Icon from '../components/Icon';
 import TopBar from '../components/TopBar';
@@ -25,6 +26,8 @@ function toneFor(deadline) {
 export default function Dashboard() {
   const { aiProfile, user } = useAuth();
   const navigate = useNavigate();
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const firstName = user?.name?.split(' ')[0] || 'Студент';
 
@@ -64,19 +67,55 @@ export default function Dashboard() {
         title="Что нового сегодня"
         actions={
           <>
-            <Search />
+            <Search 
+              value={searchQuery} 
+              onChange={setSearchQuery} 
+              onEnter={() => navigate(`/professions?q=${searchQuery}`)} 
+            />
             <div style={{ position: 'relative' }}>
-              <button style={{
-                width: 36, height: 36, borderRadius: 8, background: '#FFFFFF',
-                border: `1px solid ${C.hairline}`, display: 'flex', alignItems: 'center',
-                justifyContent: 'center', cursor: 'pointer',
-              }}>
+              <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                style={{
+                  width: 36, height: 36, borderRadius: 8, background: '#FFFFFF',
+                  border: `1px solid ${C.hairline}`, display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', cursor: 'pointer',
+                }}
+              >
                 <Icon name="bell" size={16} color={C.ink700} />
               </button>
               <span style={{
                 position: 'absolute', top: 8, right: 8, width: 6, height: 6,
                 borderRadius: 9999, background: C.blue,
               }} />
+              
+              {showNotifications && (
+                <div style={{
+                  position: 'absolute', top: 44, right: 0, width: 300, background: 'white',
+                  borderRadius: 12, boxShadow: '0 10px 30px rgba(10,18,48,0.15)',
+                  border: `1px solid ${C.hairline}`, zIndex: 100, padding: 12
+                }}>
+                  <div style={{ fontFamily: C.font, fontSize: 13, fontWeight: 700, color: C.ink900, marginBottom: 12, display: 'flex', justifyContent: 'space-between' }}>
+                    Уведомления
+                    <span style={{ color: C.blue, fontSize: 11, cursor: 'pointer' }} onClick={() => setShowNotifications(false)}>Закрыть</span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {[
+                      { t: 'Твой роадмап обновлен', d: 'AI подобрал новые шаги для Data Scientist', i: 'sparkles' },
+                      { t: 'Новый грант «Болашак»', d: 'Подходит под твой профиль на 92%', i: 'award' }
+                    ].map((n, i) => (
+                      <div key={i} style={{ display: 'flex', gap: 10, padding: 10, borderRadius: 8, background: C.mist }}>
+                        <div style={{ width: 24, height: 24, borderRadius: 6, background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <Icon name={n.i} size={12} color={C.blue} />
+                        </div>
+                        <div>
+                          <div style={{ fontFamily: C.font, fontSize: 12, fontWeight: 600, color: C.ink900 }}>{n.t}</div>
+                          <div style={{ fontFamily: C.font, fontSize: 11, color: C.ink500, marginTop: 1 }}>{n.d}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </>
         }

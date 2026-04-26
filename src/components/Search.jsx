@@ -1,6 +1,26 @@
+import { useEffect, useRef } from 'react';
 import Icon from './Icon';
 
-export default function Search({ placeholder = 'Найди грант, профессию или вуз...', value, onChange }) {
+export default function Search({ placeholder = 'Найди грант, профессию или вуз...', value, onChange, onEnter }) {
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const handleKey = (e) => {
+    if (e.key === 'Enter' && onEnter) {
+      onEnter();
+    }
+  };
+
   return (
     <div
       style={{
@@ -20,10 +40,12 @@ export default function Search({ placeholder = 'Найди грант, проф�
     >
       <Icon name="search" size={16} color="#5A6485" />
       <input
+        ref={inputRef}
         type="text"
         placeholder={placeholder}
         value={value}
         onChange={e => onChange?.(e.target.value)}
+        onKeyDown={handleKey}
         style={{
           border: 'none',
           outline: 'none',
@@ -35,14 +57,19 @@ export default function Search({ placeholder = 'Найди грант, проф�
           height: '100%',
         }}
       />
-      <span style={{
-        fontFamily: 'var(--font-mono)',
-        fontSize: 11,
-        color: '#9AA3BF',
-        padding: '2px 6px',
-        border: '1px solid #E4E8F1',
-        borderRadius: 4,
-      }}>⌘K</span>
+      <span 
+        onClick={() => inputRef.current?.focus()}
+        style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: 11,
+          color: '#9AA3BF',
+          padding: '2px 6px',
+          border: '1px solid #E4E8F1',
+          borderRadius: 4,
+          cursor: 'pointer',
+          userSelect: 'none'
+        }}
+      >⌘K</span>
     </div>
   );
 }

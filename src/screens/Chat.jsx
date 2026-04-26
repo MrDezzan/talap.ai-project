@@ -35,9 +35,9 @@ function RoadmapMessage({ steps }) {
               {i < steps.length - 1 && <div style={{ width: 2, flex: 1, background: C.blue100, margin: '4px 0' }} />}
             </div>
             <div style={{ flex: 1, paddingBottom: 24 }}>
-              <div style={{ fontFamily: C.font, fontSize: 14, fontWeight: 700, color: C.ink900 }}>{step.title || step.step || `Шаг ${i + 1}`}</div>
-              <div style={{ fontFamily: C.font, fontSize: 13, color: C.ink500, marginTop: 2, lineHeight: 1.4 }}>{step.description || step.desc || ''}</div>
-              {(step.duration || step.time) && <div style={{ display: 'inline-flex', marginTop: 8, padding: '2px 8px', borderRadius: 4, background: C.paper, border: `1px solid ${C.hairline}`, fontFamily: '"Geist Mono",monospace', fontSize: 11, color: C.blue, fontWeight: 600 }}>{step.duration || step.time}</div>}
+              <div style={{ fontFamily: C.font, fontSize: 14, fontWeight: 700, color: C.ink900 }}>{step.title || step.Title || step.step || step.Step || `Шаг ${i + 1}`}</div>
+              <div style={{ fontFamily: C.font, fontSize: 13, color: C.ink500, marginTop: 2, lineHeight: 1.4 }}>{step.description || step.Description || step.desc || step.Desc || ''}</div>
+              {(step.duration || step.Duration || step.time || step.Time) && <div style={{ display: 'inline-flex', marginTop: 8, padding: '2px 8px', borderRadius: 4, background: C.paper, border: `1px solid ${C.hairline}`, fontFamily: '"Geist Mono",monospace', fontSize: 11, color: C.blue, fontWeight: 600 }}>{step.duration || step.Duration || step.time || step.Time}</div>}
             </div>
           </div>
         ))}
