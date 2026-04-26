@@ -6,10 +6,6 @@ import logomark from '../assets/logomark.svg';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 
-const NAV_ITEMS = [
-// ...
-];
-
 export default function Sidebar() {
   const { user } = useAuth();
   const { lang, setLang, t } = useLanguage();
@@ -22,7 +18,7 @@ export default function Sidebar() {
     { to: '/portfolio',   label: t('nav_portfolio'),     icon: 'trophy' },
     { to: '/chat',        label: t('nav_chat'),          icon: 'sparkles' },
   ];
-  return (
+
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
 
   if (isMobile) {

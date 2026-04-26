@@ -60,7 +60,6 @@ export default function Dashboard() {
       ];
 
   const topGrant = aiProfile?.grants?.[0];
-
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
 
   return (
@@ -258,8 +257,6 @@ export default function Dashboard() {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {/* Roadmap and others... */}
-
           {aiProfile?.roadmap?.length > 0 ? (
             <Card>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
@@ -330,7 +327,7 @@ export default function Dashboard() {
             </Card>
           )}
 
-            <Mesh intensity={0.45} style={{ borderRadius: 12, padding: 18 }}>
+          <Mesh intensity={0.45} style={{ borderRadius: 12, padding: 18 }}>
             <Chip dot tone="ai" style={{ background: 'rgba(255,255,255,0.15)', color: 'white' }}>Talap AI</Chip>
             <div style={{ fontFamily: C.font, fontSize: 14, fontWeight: 600, color: 'white', marginTop: 10, lineHeight: 1.4 }}>
               {aiProfile?.summary

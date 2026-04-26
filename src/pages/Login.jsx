@@ -3,13 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import Button from '../components/Button';
-import Icon from '../components/Icon';
 
 const C = {
   ink900: '#0A1230', ink700: '#2A3457', ink500: '#5A6485', ink300: '#9AA3BF',
-  blue: '#1448FF', blue100: '#E6ECFF',
+  blue: '#1448FF', blue50: '#F2F5FF', blue100: '#E6ECFF',
   paper: '#FFFFFF', mist: '#F5F7FB', hairline: '#E4E8F1',
-  error700: '#B42318', error100: '#FDECEC',
+  error700: '#B42318',
   font: 'var(--font-sans)',
 };
 
@@ -33,7 +32,7 @@ function Field({ label, type = 'text', value, onChange, placeholder, error, auto
           border: `1px solid ${error ? C.error700 : focused ? C.blue : C.hairline}`,
           fontFamily: C.font, fontSize: 15, color: C.ink900, background: C.paper,
           outline: 'none', transition: 'border-color 150ms',
-          boxShadow: focused ? `0 0 0 3px ${error ? 'rgba(180,35,24,0.08)' : 'rgba(20,72,255,0.08)'}` : 'none',
+          boxShadow: focused ? `0 0 0 3px rgba(20,72,255,0.08)` : 'none',
           boxSizing: 'border-box',
         }}
       />
@@ -48,43 +47,14 @@ export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-
-  const validate = () => {
-    const e = {};
-    if (!email) e.email = 'Введи email';
-    else if (!/\S+@\S+\.\S+/.test(email)) e.email = 'Некорректный email';
-    if (!password) e.password = 'Введи пароль';
-    else if (password.length < 6) e.password = 'Минимум 6 символов';
-    return e;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length) { setErrors(errs); return; }
-    setLoading(true);
-    try {
-      const res = await login(email, password);
-      if (res.token) {
-        navigate('/dashboard');
-      } else {
-        setErrors({ email: res.error || 'Ошибка входа' });
-      }
-    } catch (err) {
-      setErrors({ email: 'Ошибка сервера' });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
     if (token) {
       localStorage.setItem('token', token);
-      // Fetch user data and sync context
       const sync = async () => {
         try {
           await loginWithToken(token);
@@ -96,6 +66,24 @@ export default function Login() {
       sync();
     }
   }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const errs = {};
+    if (!email) errs.email = t('auth_error_email');
+    if (!password) errs.password = t('auth_error_pass');
+    if (Object.keys(errs).length) { setErrors(errs); return; }
+
+    setLoading(true);
+    try {
+      const res = await login(email.toLowerCase(), password);
+      if (res.error) throw res;
+      navigate('/dashboard');
+    } catch (err) {
+      setErrors({ email: err.message || 'Ошибка входа' });
+      setLoading(false);
+    }
+  };
 
   const handleGoogleLogin = () => {
     console.log("Google Login clicked");
@@ -187,7 +175,6 @@ export default function Login() {
           </svg>
           {t('auth_google')}
         </button>
-      </div>
       </div>
 
       <p style={{ textAlign: 'center', fontFamily: C.font, fontSize: 14, color: C.ink500, marginTop: 24 }}>
