@@ -104,6 +104,8 @@ export default function Login() {
     window.location.href = url;
   };
 
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+
   return (
     <div style={{ 
       width: '100%', 
