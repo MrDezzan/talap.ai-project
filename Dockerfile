@@ -8,7 +8,7 @@ ENV VITE_API_URL=/api
 RUN npm run build
 
 # --- STAGE 2: Build Backend ---
-FROM golang:1.21-alpine AS backend-builder
+FROM golang:1.23-alpine AS backend-builder
 WORKDIR /app
 COPY backend/go.mod backend/go.sum ./
 RUN go mod download
