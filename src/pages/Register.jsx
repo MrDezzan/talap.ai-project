@@ -203,7 +203,12 @@ export default function Register() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const stepParam = params.get('step');
-    if (stepParam === '1' || (user && !user.grade)) {
+    
+    // Если пользователь залогинен (через Google), но у него нет класса, 
+    // ВСЕГДА перекидываем на шаг 1
+    if (user && !user.grade) {
+      setStep(1);
+    } else if (stepParam === '1') {
       setStep(1);
     }
   }, [user]);
@@ -364,22 +369,25 @@ export default function Register() {
     }}>
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
         <h1 style={{ fontFamily: C.font, fontSize: isMobile ? 24 : 28, fontWeight: 800, letterSpacing: '-0.025em', color: C.ink900, margin: '0 0 8px' }}>
-          {t('auth_register_title')}
+          {user ? (lang === 'en' ? 'Almost ready!' : lang === 'kz' ? 'Дайын болуға жақын!' : 'Почти готово!') : t('auth_register_title')}
         </h1>
         <p style={{ fontFamily: C.font, fontSize: 15, color: C.ink500, margin: 0 }}>
-          {lang === 'en' ? `Step ${step + 1} of 2` : lang === 'kz' ? `${step + 1}-ші қадам` : `Шаг ${step + 1} из 2`}
+          {user ? (lang === 'en' ? 'Just a few more details' : lang === 'kz' ? 'Кейбір деректерді толтырыңыз' : 'Осталось заполнить пару деталей') : 
+           (lang === 'en' ? `Step ${step + 1} of 2` : lang === 'kz' ? `${step + 1}-ші қадам` : `Шаг ${step + 1} из 2`)}
         </p>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 28 }}>
-        {[0, 1].map(i => (
-          <div key={i} style={{
-            flex: 1, height: 4, borderRadius: 9999,
-            background: i <= step ? C.blue : C.hairline,
-            transition: 'background 300ms',
-          }} />
-        ))}
-      </div>
+      {!user && (
+        <div style={{ display: 'flex', gap: 8, marginBottom: 28 }}>
+          {[0, 1].map(i => (
+            <div key={i} style={{
+              flex: 1, height: 4, borderRadius: 9999,
+              background: i <= step ? C.blue : C.hairline,
+              transition: 'background 300ms',
+            }} />
+          ))}
+        </div>
+      )}
 
       <div style={{ 
         background: C.paper, 
