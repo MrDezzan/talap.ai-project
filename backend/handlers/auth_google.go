@@ -84,7 +84,7 @@ func GoogleCallback(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		// Generate JWT
-		jwtToken, err := auth.GenerateToken(user.ID)
+		jwtToken, err := auth.GenerateToken(user.ID, user.Email, user.Name)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 			return
