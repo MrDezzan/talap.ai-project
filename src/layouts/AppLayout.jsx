@@ -1,13 +1,13 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
+import { useMobile } from '../hooks/useMobile';
 
 export default function AppLayout() {
   const { user } = useAuth();
+  const isMobile = useMobile();
   
   if (!user) return <Navigate to="/login" replace />;
-
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
 
   return (
     <div style={{ 
@@ -23,7 +23,7 @@ export default function AppLayout() {
         display: 'flex', 
         flexDirection: 'column', 
         overflowY: 'auto',
-        paddingBottom: isMobile ? 80 : 0
+        paddingBottom: isMobile ? 64 : 0
       }}>
         <Outlet />
       </main>

@@ -6,9 +6,12 @@ import logomark from '../assets/logomark.svg';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 
+import { useMobile } from '../hooks/useMobile';
+
 export default function Sidebar() {
   const { user } = useAuth();
   const { lang, setLang, t } = useLanguage();
+  const isMobile = useMobile();
   
   const navItems = [
     { to: '/dashboard',   label: t('nav_home'),          icon: 'home' },
@@ -19,7 +22,7 @@ export default function Sidebar() {
     { to: '/chat',        label: t('nav_chat'),          icon: 'sparkles' },
   ];
 
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+
 
   if (isMobile) {
     return (

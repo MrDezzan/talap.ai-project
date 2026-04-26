@@ -46,9 +46,12 @@ function RoadmapMessage({ steps }) {
   );
 }
 
+import { useMobile } from '../hooks/useMobile';
+
 export default function Chat() {
   const { user, aiProfile } = useAuth();
   const { t } = useLanguage();
+  const isMobile = useMobile();
   const { 
     threads, fetchThreads, activeThreadId, setActiveThreadId, 
     messages: allMessages, addMessage, fetchMessages, setMessages,
@@ -147,35 +150,37 @@ export default function Chat() {
   };
 
   return (
-    <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '280px 1fr', background: '#FFFFFF', height: '100%', minHeight: 0 }}>
-      <div style={{ borderRight: `1px solid ${C.hairline}`, display: 'flex', flexDirection: 'column', background: C.mist, height: '100%', minHeight: 0 }}>
-        <div style={{ padding: 20 }}>
-          <Button variant="outline" fullWidth icon="plus" onClick={startNew}>{t('chat_new')}</Button>
-        </div>
-        <div style={{ flex: 1, overflow: 'auto', padding: '0 12px 20px' }}>
-          {threads.map(thread => (
-            <div
-              key={thread.id}
-              onClick={() => setActiveThreadId(thread.id)}
-              style={{
-                padding: '12px 16px', borderRadius: 12, cursor: 'pointer', marginBottom: 4,
-                background: activeThreadId === thread.id ? '#FFFFFF' : 'transparent',
-                boxShadow: activeThreadId === thread.id ? '0 4px 12px rgba(10,18,48,0.05)' : 'none',
-                transition: 'all 200ms',
-              }}
-            >
-              <div style={{ fontFamily: C.font, fontSize: 14, fontWeight: activeThreadId === thread.id ? 700 : 500, color: activeThreadId === thread.id ? C.ink900 : C.ink500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {thread.title}
+    <div style={{ flex: 1, display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '280px 1fr', background: '#FFFFFF', height: '100%', minHeight: 0 }}>
+      {!isMobile && (
+        <div style={{ borderRight: `1px solid ${C.hairline}`, display: 'flex', flexDirection: 'column', background: C.mist, height: '100%', minHeight: 0 }}>
+          <div style={{ padding: 20 }}>
+            <Button variant="outline" fullWidth icon="plus" onClick={startNew}>{t('chat_new')}</Button>
+          </div>
+          <div style={{ flex: 1, overflow: 'auto', padding: '0 12px 20px' }}>
+            {threads.map(thread => (
+              <div
+                key={thread.id}
+                onClick={() => setActiveThreadId(thread.id)}
+                style={{
+                  padding: '12px 16px', borderRadius: 12, cursor: 'pointer', marginBottom: 4,
+                  background: activeThreadId === thread.id ? '#FFFFFF' : 'transparent',
+                  boxShadow: activeThreadId === thread.id ? '0 4px 12px rgba(10,18,48,0.05)' : 'none',
+                  transition: 'all 200ms',
+                }}
+              >
+                <div style={{ fontFamily: C.font, fontSize: 14, fontWeight: activeThreadId === thread.id ? 700 : 500, color: activeThreadId === thread.id ? C.ink900 : C.ink500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {thread.title}
+                </div>
+                <div style={{ fontFamily: C.font, fontSize: 11, color: C.ink300, marginTop: 4 }}>{new Date(thread.updated_at).toLocaleDateString()}</div>
               </div>
-              <div style={{ fontFamily: C.font, fontSize: 11, color: C.ink300, marginTop: 4 }}>{new Date(thread.updated_at).toLocaleDateString()}</div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div style={{ display: 'flex', flexDirection: 'column', position: 'relative', height: '100%', minHeight: 0 }}>
-        <div ref={scrollRef} style={{ flex: 1, overflow: 'auto', padding: '40px 0', minHeight: 0 }}>
-          <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 24px' }}>
+        <div ref={scrollRef} style={{ flex: 1, overflow: 'auto', padding: isMobile ? '20px 0' : '40px 0', minHeight: 0 }}>
+          <div style={{ maxWidth: 720, margin: '0 auto', padding: isMobile ? '0 16px' : '0 24px' }}>
             {messages.length === 0 && (
               <div style={{ textAlign: 'center', marginTop: 40 }}>
                 <div style={{ width: 64, height: 64, borderRadius: 20, margin: '0 auto 24px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'white', boxShadow: '0 8px 24px rgba(10,18,48,0.06)' }}>

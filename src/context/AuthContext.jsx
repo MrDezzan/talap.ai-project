@@ -104,8 +104,11 @@ export function AuthProvider({ children }) {
 
   const loginWithToken = async (token) => {
     localStorage.setItem('token', token);
-    await fetchMe();
+    const data = await api.get('/me');
+    setUser(data);
+    localStorage.setItem('talap_user', JSON.stringify(data));
     await fetchAIProfile();
+    return data;
   };
 
   const logout = () => {

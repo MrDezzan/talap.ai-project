@@ -204,19 +204,47 @@ function AnalyzingScreen({ name, lang }) {
   );
 }
 
+import { useMobile } from '../hooks/useMobile';
+
 export default function Register() {
-  const { login, register, analyzeProfile } = useAuth();
+  const { user, login, register, analyzeProfile, updateUser } = useAuth();
   const { t, lang } = useLanguage();
   const navigate = useNavigate();
+  const isMobile = useMobile();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [analyzingName, setAnalyzingName] = useState('');
   const submittingRef = useRef(false);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const stepParam = params.get('step');
+    if (stepParam === '1' || (user && !user.grade)) {
+      setStep(1);
+    }
+  }, [user]);
+
   const [form, setForm] = useState({
-    name: '', email: '', password: '',
-    grade: '', city: '', interests: [],
+    name: user?.name || '', 
+    email: user?.email || '', 
+    password: '',
+    grade: user?.grade || '', 
+    city: user?.city || '', 
+    interests: [],
   });
+
+  // Update form if user data arrives (Google login)
+  useEffect(() => {
+    if (user) {
+      setForm(f => ({
+        ...f,
+        name: user.name || f.name,
+        email: user.email || f.email,
+        grade: user.grade || f.grade,
+        city: user.city || f.city,
+      }));
+    }
+  }, [user]);
   const [errors, setErrors] = useState({});
 
   const set = (field) => (e) => {
@@ -278,11 +306,20 @@ export default function Register() {
       setLoading(true);
       const email = form.email.trim().toLowerCase();
       try {
-        const regRes = await register(form.name, email, form.password, form.grade, form.city);
-        if (regRes.error) throw regRes;
+        if (user) {
+          await updateUser({
+            name: form.name,
+            grade: form.grade,
+            city: form.city,
+            interests: form.interests
+          });
+        } else {
+          const regRes = await register(form.name, email, form.password, form.grade, form.city);
+          if (regRes.error) throw regRes;
 
-        const loginRes = await login(email, form.password);
-        if (loginRes.error) throw loginRes;
+          const loginRes = await login(email, form.password);
+          if (loginRes.error) throw loginRes;
+        }
 
         setAnalyzingName(form.name.split(' ')[0]);
         setStep(2);
@@ -307,7 +344,7 @@ export default function Register() {
           setStep(0);
           setErrors({ email: err.error || err.message || (lang === 'en' ? 'Email already registered' : 'Этот email уже зарегистрирован') });
         } else {
-          setErrors({ grade: err.message || 'Ошибка регистрации. Попробуй снова.' });
+          setErrors({ grade: err.message || 'Ошибка. Попробуй снова.' });
         }
         setLoading(false);
       } finally {

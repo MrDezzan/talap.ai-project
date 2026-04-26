@@ -200,9 +200,12 @@ function AchievementModal({ onClose, onSave, onDelete, initialData }) {
   );
 }
 
+import { useMobile } from '../hooks/useMobile';
+
 export default function Portfolio() {
   const { user, analyzeProfile } = useAuth();
   const { t } = useLanguage();
+  const isMobile = useMobile();
   const [portfolio, setPortfolio] = useState({ bio: '', ent: '', english: '', skills: [], achievements: [] });
   const [loading, setLoading] = useState(true);
   const [editingItem, setEditingItem] = useState(null);
@@ -296,10 +299,10 @@ export default function Portfolio() {
         />
       </div>
 
-      <div className="grid-layout" style={{ padding: 32, display: 'grid', gridTemplateColumns: '1fr 320px', gap: 24, maxWidth: 1200, margin: '0 auto' }}>
+      <div className="grid-layout" style={{ padding: isMobile ? 16 : 32, display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 320px', gap: 24, maxWidth: 1200, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
         <div>
 
-          <div className="stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 28 }}>
+          <div className="stats-row" style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 12, marginBottom: 28 }}>
             {[
               { v: '87%', l: t('port_avg_match') },
               { v: Array.isArray(portfolio.achievements) ? portfolio.achievements.length : 0, l: t('port_achievements_count') },
@@ -317,11 +320,11 @@ export default function Portfolio() {
             <div className="no-print" style={{ position: 'absolute', top: 32, right: 32 }}>
               <Button variant="outline" size="sm" icon="settings" onClick={() => setShowProfileEdit(true)}>{t('port_edit')}</Button>
             </div>
-            <div style={{ display: 'flex', gap: 24, alignItems: 'center', marginBottom: 32 }}>
-              <Avatar name={user?.name} size={84} />
+            <div style={{ display: 'flex', gap: isMobile ? 16 : 24, alignItems: 'center', marginBottom: 32, flexDirection: isMobile ? 'column' : 'row', textAlign: isMobile ? 'center' : 'left' }}>
+              <Avatar name={user?.name} size={isMobile ? 64 : 84} />
               <div>
-                <div style={{ fontFamily: C.font, fontSize: 24, fontWeight: 800, color: C.ink900 }}>{user?.name}</div>
-                <div style={{ fontFamily: C.font, fontSize: 15, color: C.ink500, marginTop: 4 }}>{user?.grade} · {user?.city}</div>
+                <div style={{ fontFamily: C.font, fontSize: isMobile ? 20 : 24, fontWeight: 800, color: C.ink900 }}>{user?.name}</div>
+                <div style={{ fontFamily: C.font, fontSize: 14, color: C.ink500, marginTop: 4 }}>{user?.grade} · {user?.city}</div>
               </div>
             </div>
 

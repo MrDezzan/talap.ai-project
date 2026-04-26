@@ -109,9 +109,12 @@ function GrantDetailModal({ grant, onClose, t, lang }) {
   );
 }
 
+import { useMobile } from '../hooks/useMobile';
+
 export default function Grants() {
   const navigate = useNavigate();
   const { t, lang } = useLanguage();
+  const isMobile = useMobile();
   const [grants, setGrants] = useState([]);
   const [portfolio, setPortfolio] = useState({});
   const [loading, setLoading] = useState(true);
@@ -157,15 +160,15 @@ export default function Grants() {
     <div style={{ flex: 1, overflow: 'auto', background: C.mist, display: 'flex', flexDirection: 'column' }}>
       <TopBar
         title={t('grants_title')}
-        subtitle={`${grants.length} ${t('grants_subtitle')}`}
+        subtitle={isMobile ? null : `${grants.length} ${t('grants_subtitle')}`}
         actions={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: isMobile ? '100%' : 'auto' }}>
             <Search value={search} onChange={setSearch} placeholder={t('grants_search')} />
           </div>
         }
       />
 
-      <div style={{ padding: 32 }}>
+      <div style={{ padding: isMobile ? 16 : 32 }}>
         
         <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
           {FILTERS.map(f => (
@@ -175,7 +178,7 @@ export default function Grants() {
           <Chip dot tone="ai" onClick={() => navigate('/chat')}>{t('grants_ai_match')}</Chip>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 320px', gap: 24 }}>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {filtered.map(g => (
